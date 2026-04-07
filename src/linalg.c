@@ -57,29 +57,44 @@ matrix *matrix_scalar_mult(matrix *a, float value) {
 }
 
 matrix *matrix_transpose(matrix *a) {
-
+  // transpose a matrix
   matrix *r = matrix_new(a->num_rows, a->num_cols);
+  matrix_transpose_r(r);
+  return r;
+}
 
+int matrix_transpose_r(matrix *a) {
+  // transpose a matrix without deep copying it
   for (unsigned int i = 0; i < a->num_rows; i++) {
     for (unsigned int j = 0; j < a->num_rows; j++) {
-      r->data[j][i] = a->data[i][j];
+      a->data[j][i] = a->data[i][j];
     }
   }
-
-  return r;
+  return 1;
 }
 
 matrix *matrix_mult(matrix *a, matrix *b) {
 
-  if (a->num_rows != b->num_cols) {
+  if (a->num_cols != b->num_rows) {
     printf("ERROR: cannot multiply a (%d, %d) matrix by a (%d, %d) matrix.",
            a->num_rows, a->num_cols, b->num_rows, b->num_cols);
     return NULL;
   }
 
+  matrix *r = matrix_new(a->num_rows, b->num_cols);
+
   for (unsigned int i = 0; i < a->num_rows; i++) {
-    for (unsigned int j = 0; j < a->num_rows; j++) {
-      r->data[j][i] = a->data[i][j];
+    for (unsigned int j = 0; j < b->num_cols; j++) {
+
+      double sum = 0;
+
+      for (unsigned int k = 0; k < a->num_cols; k++) {
+        sum += a->data[i][k] * b->data[k][j];
+      }
+
+      r->data[i][j] = sum;
     }
   }
+
+  return r;
 }

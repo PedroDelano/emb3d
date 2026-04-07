@@ -6,7 +6,7 @@ Embeddings model from scratch in C.
 
 - [x] Matrix struct and basic constructors (new, square, identity, free, print)
 - [x] Matrix operations (add, subtract, scalar multiply, transpose)
-- [ ] Matrix multiplication
+- [x] Matrix multiplication
 - [ ] Dot product
 - [ ] Tokenizer (map text to integer IDs)
 - [ ] Vocabulary builder

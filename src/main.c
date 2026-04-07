@@ -9,10 +9,19 @@ int main(void) {
   a->data[0][1] = 2;
   a->data[0][2] = 3;
 
+  b->data[0][1] = 2;
+  b->data[0][2] = 3;
+
+  matrix_print(a);
+  matrix_transpose_r(a);
+  matrix_print(a);
+  printf("%%%%");
+
   matrix *c = matrix_add(a, b);
   matrix *d = matrix_sub(a, b);
   matrix *e = matrix_scalar_mult(a, 16);
   matrix *f = matrix_transpose(a);
+  matrix *g = matrix_mult(a, b);
   matrix_print(c);
   printf("---");
   matrix_print(d);
@@ -20,5 +29,7 @@ int main(void) {
   matrix_print(e);
   printf("---");
   matrix_print(f);
+  printf("---");
+  matrix_print(g);
   return 0;
 }
