@@ -9,6 +9,11 @@ Embeddings model from scratch in C.
 - [x] Matrix multiplication
 - [x] Dot product
 - [ ] Tokenizer (map text to integer IDs)
+  - [x] Load vocab file and count tokens
+  - [ ] Build token-to-ID map (string → int)
+  - [ ] Encode function (string → int ID)
+  - [ ] Decode function (int ID → string)
+  - [ ] Tokenize raw text (split + encode)
 - [ ] Vocabulary builder
 - [ ] Embedding lookup table (matrix of token vectors)
 - [ ] Forward pass (token → embedding vector)

@@ -1,8 +1,13 @@
 #include "linalg.h"
 #include "matrix.h"
+#include "tokenizer.h"
 #include <stdio.h>
 
 int main(void) {
+
+  generate_token_map("data/vocab.txt");
+  return 0;
+
   matrix *a = matrix_new_eye(4);
   matrix *b = matrix_new_eye(4);
 
