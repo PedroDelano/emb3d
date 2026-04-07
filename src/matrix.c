@@ -1,6 +1,6 @@
+#include "matrix.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include "matrix.h"
 
 // Constructor: Allocates a new matrix on the heap
 // All elements are initialized to 0.0
@@ -8,7 +8,7 @@ matrix *matrix_new(unsigned int num_rows, unsigned int num_cols) {
 
   if (num_rows == 0 || num_cols == 0) {
     printf("ERROR: cannot create matrix with size 0 (row or col)");
-      return NULL;
+    return NULL;
   }
 
   // allocate matrix in memory
@@ -39,7 +39,6 @@ matrix *matrix_new(unsigned int num_rows, unsigned int num_cols) {
   }
 
   return m;
-
 }
 
 // Destructor: Safely releases all memory associated with the matrix
@@ -47,19 +46,17 @@ void matrix_free(matrix *m) {
   if (m == NULL) {
     return;
   }
-  for (unsigned int i = 0; i < m->num_rows; i++){
+  for (unsigned int i = 0; i < m->num_rows; i++) {
     free(m->data[i]);
   }
   free(m->data);
   free(m);
 }
 
-
 matrix *matrix_new_sqr(unsigned int n) {
   // Creates a square matrix N x N
   return matrix_new(n, n);
 }
-
 
 matrix *matrix_new_eye(unsigned int n) {
   // Creates an identity matrix

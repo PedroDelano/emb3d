@@ -12,7 +12,10 @@ $(OUT): $(SRC) include/matrix.h include/linalg.h
 run: $(OUT)
 	./$(OUT)
 
+format:
+	clang-format -i $(SRC) include/*.h
+
 clean:
 	rm -rf build
 
-.PHONY: all run clean
+.PHONY: all run format clean

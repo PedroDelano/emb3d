@@ -1,18 +1,18 @@
+#include "linalg.h"
+#include "matrix.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include "matrix.h"
-#include "linalg.h"
 
 /***************************************************
  * BASIC MATRIX OPERATIONS
  ***************************************************/
 
 matrix *matrix_add(matrix *a, matrix *b) {
-  
+
   if (a->num_rows != b->num_rows || a->num_cols != b->num_cols) {
     printf("ERROR: cannot add matrices of different sizes");
     return NULL;
-  } 
+  }
 
   matrix *c = matrix_new(a->num_rows, a->num_cols);
 
@@ -25,13 +25,12 @@ matrix *matrix_add(matrix *a, matrix *b) {
   return c;
 }
 
-
 matrix *matrix_sub(matrix *a, matrix *b) {
-  
+
   if (a->num_rows != b->num_rows || a->num_cols != b->num_cols) {
     printf("ERROR: cannot add matrices of different sizes");
     return NULL;
-  } 
+  }
 
   matrix *c = matrix_new(a->num_rows, a->num_cols);
 
@@ -43,7 +42,6 @@ matrix *matrix_sub(matrix *a, matrix *b) {
 
   return c;
 }
-
 
 matrix *matrix_scalar_mult(matrix *a, float value) {
 
@@ -58,7 +56,6 @@ matrix *matrix_scalar_mult(matrix *a, float value) {
   return r;
 }
 
-
 matrix *matrix_transpose(matrix *a) {
 
   matrix *r = matrix_new(a->num_rows, a->num_cols);
@@ -72,4 +69,17 @@ matrix *matrix_transpose(matrix *a) {
   return r;
 }
 
+matrix *matrix_mult(matrix *a, matrix *b) {
 
+  if (a->num_rows != b->num_cols) {
+    printf("ERROR: cannot multiply a (%d, %d) matrix by a (%d, %d) matrix.",
+           a->num_rows, a->num_cols, b->num_rows, b->num_cols);
+    return NULL;
+  }
+
+  for (unsigned int i = 0; i < a->num_rows; i++) {
+    for (unsigned int j = 0; j < a->num_rows; j++) {
+      r->data[j][i] = a->data[i][j];
+    }
+  }
+}
