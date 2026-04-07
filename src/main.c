@@ -30,5 +30,25 @@ int main(void) {
   matrix_print(f);
   printf("---");
   matrix_print(g);
+
+
+  matrix *v1 = matrix_new(1, 3);
+  matrix *v2 = matrix_new(1, 3);
+  v2 = matrix_transpose(v2);
+
+  v1->data[0][0] = 1;
+  v1->data[0][1] = 2;
+  v1->data[0][2] = 3;
+
+  v2->data[0][0] = 1;
+  v2->data[1][0] = 2;
+  v2->data[2][0] = 3;
+
+  matrix_print(v1);
+  matrix_print(v2);
+
+  double dp = dot_product(v1, v2);
+  printf("%f", dp);
+
   return 0;
 }
