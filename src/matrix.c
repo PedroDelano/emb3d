@@ -42,6 +42,7 @@ matrix *matrix_new(unsigned int num_rows, unsigned int num_cols) {
 
 }
 
+// Destructor: Safely releases all memory associated with the matrix
 void matrix_free(matrix *m) {
   if (m == NULL) {
     return;
@@ -54,6 +55,21 @@ void matrix_free(matrix *m) {
 }
 
 
+matrix *matrix_new_sqr(unsigned int n) {
+  // Creates a square matrix N x N
+  return matrix_new(n, n);
+}
+
+
+matrix *matrix_new_eye(unsigned int n) {
+  // Creates an identity matrix
+  matrix *m = matrix_new(n, n);
+  for (unsigned int i = 0; i < m->num_rows; i++) {
+    m->data[i][i] = 1;
+  }
+  return m;
+}
+
 void matrix_print(const matrix *m) {
   for (unsigned int i = 0; i < m->num_rows; i++) {
     printf("| ");
@@ -63,3 +79,10 @@ void matrix_print(const matrix *m) {
     printf("|\n");
   }
 }
+
+// ************************************************************
+// MATRIX FILE FORMAT
+// ************************************************************
+
+// void matrix_to_file(){}
+// matrix *matrix_from_file(){}

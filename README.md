@@ -1,4 +1,32 @@
 # emb3d
 
+Embeddings model from scratch in C.
+
+## TODO
+
+- [ ] Matrix operations (add, subtract, scalar multiply, transpose)
+- [ ] Matrix multiplication
+- [ ] Dot product
+- [ ] Tokenizer (map text to integer IDs)
+- [ ] Vocabulary builder
+- [ ] Embedding lookup table (matrix of token vectors)
+- [ ] Forward pass (token → embedding vector)
+- [ ] Loss function (e.g. cosine similarity, negative sampling)
+- [ ] Backpropagation / gradient computation
+- [ ] Weight update (SGD or similar)
+- [ ] Training loop
+- [ ] Save / load model weights
+- [ ] Inference (text → embedding vector)
+
+## Build
+
+```
+make        # compile
+make run    # compile and run
+make clean  # remove build artifacts
+```
+
+Requires `gcc` and `make`.
+
 ## References
 - https://www.andreinc.net/2021/01/20/writing-your-own-linear-algebra-matrix-library-in-c/#disclaimer
