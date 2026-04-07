@@ -56,21 +56,17 @@ matrix *matrix_scalar_mult(matrix *a, float value) {
   return r;
 }
 
+
+
 matrix *matrix_transpose(matrix *a) {
   // transpose a matrix
-  matrix *r = matrix_new(a->num_rows, a->num_cols);
-  matrix_transpose_r(r);
-  return r;
-}
-
-int matrix_transpose_r(matrix *a) {
-  // transpose a matrix without deep copying it
+  matrix *r = matrix_new(a->num_cols, a->num_rows);
   for (unsigned int i = 0; i < a->num_rows; i++) {
-    for (unsigned int j = 0; j < a->num_rows; j++) {
-      a->data[j][i] = a->data[i][j];
+    for (unsigned int j = 0; j < a->num_cols; j++) {
+      r->data[j][i] = a->data[i][j];
     }
   }
-  return 1;
+  return r;
 }
 
 matrix *matrix_mult(matrix *a, matrix *b) {

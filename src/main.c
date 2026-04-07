@@ -3,8 +3,8 @@
 #include <stdio.h>
 
 int main(void) {
-  matrix *a = matrix_new_eye(3);
-  matrix *b = matrix_new_eye(3);
+  matrix *a = matrix_new_eye(4);
+  matrix *b = matrix_new_eye(4);
 
   a->data[0][1] = 2;
   a->data[0][2] = 3;
@@ -13,9 +13,8 @@ int main(void) {
   b->data[0][2] = 3;
 
   matrix_print(a);
-  matrix_transpose_r(a);
+  a = matrix_transpose(a);
   matrix_print(a);
-  printf("%%%%");
 
   matrix *c = matrix_add(a, b);
   matrix *d = matrix_sub(a, b);

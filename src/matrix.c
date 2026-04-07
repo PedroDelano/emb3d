@@ -1,6 +1,10 @@
 #include "matrix.h"
+#include "utils.h"
 #include <stdio.h>
 #include <stdlib.h>
+
+const int MAX_DISPLAY_COLUMNS = 5;
+const int MAX_DISPLAY_ROWS = 10;
 
 // Constructor: Allocates a new matrix on the heap
 // All elements are initialized to 0.0
@@ -53,6 +57,16 @@ void matrix_free(matrix *m) {
   free(m);
 }
 
+matrix *matrix_copy(matrix *a) {
+  matrix *r = matrix_new(a->num_rows, a->num_cols);
+  for (unsigned int i = 0; i < a->num_rows; i++) {
+    for (unsigned int j = 0; j < a->num_cols; j++) {
+      r->data[j][i] = a->data[i][j];
+    }
+  }
+  return r;
+}
+
 matrix *matrix_new_sqr(unsigned int n) {
   // Creates a square matrix N x N
   return matrix_new(n, n);
@@ -68,15 +82,38 @@ matrix *matrix_new_eye(unsigned int n) {
 }
 
 void matrix_print(const matrix *m) {
-  printf("\n");
-  for (unsigned int i = 0; i < m->num_rows; i++) {
-    printf("| ");
-    for (unsigned int j = 0; j < m->num_cols; j++) {
-      printf("%8.2f ", m->data[i][j]);
-    }
-    printf("|\n");
+  unsigned int disp_rows = min(m->num_rows, MAX_DISPLAY_ROWS);
+  unsigned int disp_cols = min(m->num_cols, MAX_DISPLAY_COLUMNS);
+  int trunc_rows = m->num_rows > (unsigned int)MAX_DISPLAY_ROWS;
+  int trunc_cols = m->num_cols > (unsigned int)MAX_DISPLAY_COLUMNS;
+
+  // Column header
+  printf("\n%6s", "");
+  for (unsigned int j = 0; j < disp_cols; j++) {
+    printf("%9u", j);
+  }
+  if (trunc_cols) {
+    printf("      ...");
   }
   printf("\n");
+
+  // Data rows
+  for (unsigned int i = 0; i < disp_rows; i++) {
+    printf("%5u ", i);
+    for (unsigned int j = 0; j < disp_cols; j++) {
+      printf("%9.2f", m->data[i][j]);
+    }
+    if (trunc_cols) {
+      printf("      ...");
+    }
+    printf("\n");
+  }
+
+  if (trunc_rows) {
+    printf("  ...\n");
+  }
+
+  printf("\n[%u rows x %u cols]\n\n", m->num_rows, m->num_cols);
 }
 
 // ************************************************************
