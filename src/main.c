@@ -1,11 +1,24 @@
+#include <stdio.h>
 #include "matrix.h"
+#include "linalg.h"
 
 int main(void) {
-    matrix *m = matrix_new_eye(3);
-    // m->data[0][0] = 1.0;
-    // m->data[1][1] = 2.0;
-    // m->data[2][2] = 3.0;
-    matrix_print(m);
-    matrix_free(m);
+    matrix *a = matrix_new_eye(3);
+    matrix *b = matrix_new_eye(3);
+
+    a->data[0][1] = 2;
+    a->data[0][2] = 3;
+
+    matrix *c = matrix_add(a, b);
+    matrix *d = matrix_sub(a, b);
+    matrix *e = matrix_scalar_mult(a, 16);
+    matrix *f = matrix_transpose(a);
+    matrix_print(c);
+    printf("---");
+    matrix_print(d);
+    printf("---");
+    matrix_print(e);
+    printf("---");
+    matrix_print(f);
     return 0;
 }
