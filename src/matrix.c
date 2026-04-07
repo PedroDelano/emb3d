@@ -68,6 +68,7 @@ matrix *matrix_new_eye(unsigned int n) {
 }
 
 void matrix_print(const matrix *m) {
+  printf("\n");
   for (unsigned int i = 0; i < m->num_rows; i++) {
     printf("| ");
     for (unsigned int j = 0; j < m->num_cols; j++) {
@@ -75,6 +76,7 @@ void matrix_print(const matrix *m) {
     }
     printf("|\n");
   }
+  printf("\n");
 }
 
 // ************************************************************
