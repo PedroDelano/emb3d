@@ -57,8 +57,6 @@ matrix *matrix_scalar_mult(matrix *a, float value) {
   return r;
 }
 
-
-
 matrix *matrix_transpose(matrix *a) {
   // transpose a matrix
   matrix *r = matrix_new(a->num_cols, a->num_rows);
@@ -100,7 +98,6 @@ matrix *matrix_mult(matrix *a, matrix *b) {
  * VECTOR OPERATIONS
  ********************************************************/
 
-
 double dot_product(matrix *a, matrix *b) {
   assert(a->num_rows == 1 && "a must be a (1, N) matrix");
   assert(b->num_cols == 1 && "b must be a (N, 1) matrix");
@@ -109,5 +106,4 @@ double dot_product(matrix *a, matrix *b) {
   assert(dp->num_rows == 1);
   assert(dp->num_cols == 1);
   return dp->data[0][0];
-
 }

@@ -36,7 +36,6 @@ int main(void) {
   printf("---");
   matrix_print(g);
 
-
   matrix *v1 = matrix_new(1, 3);
   matrix *v2 = matrix_new(1, 3);
   v2 = matrix_transpose(v2);
