@@ -7,6 +7,7 @@
  * an integer - encode)
  * */
 
+#include "hashmap.h"
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,45 +20,38 @@ const int MAX_TOKEN_SIZE = 255;
  * TOKENIZER IMPLEMENTATION
  *********************************************/
 
-char **generate_token_map(char *fpath) {
+Node **generate_token_map(char *fpath) {
   // this function will return an array
   // that maps an integer to (a pointer of) a string
   FILE *fptr;
   char buffer[MAX_TOKEN_SIZE];
+
+  // Create the hashmap
+  Node **hashmap = hashmap_start();
 
   fptr = fopen(fpath, "r");
   assert(fptr != NULL && "Could not open file.");
 
   int n_tokens = 0;
   while (fgets(buffer, 255, fptr)) {
+
+    // Size of buffer without the trailing
+    // \n at the end
+    size_t len = strlen(buffer);
+    if (len > 0 && buffer[len - 1] == '\n') {
+      buffer[len - 1] = '\0';
+    }
+
+    // allocate the string in memory
+    char *dest = malloc(len);
+    strcpy(dest, buffer);
+
+    // insert string in hashmap
+    hashmap_insert(hashmap, dest);
     n_tokens++;
   }
 
   assert(n_tokens > 0 && "empty vocab file");
 
-  // allocated an array of size n_tokens
-  char **map = malloc(n_tokens * sizeof(char *));
-
-  // going back to the first line
-  rewind(fptr);
-
-  int idx = 0;
-  while (fgets(buffer, 255, fptr)) {
-
-    // allocating memory for the string
-    size_t len = strlen(buffer) + 1;
-    char *dest = (char *)malloc(len);
-
-    // copying the string into memory
-    strcpy(dest, buffer);
-
-    // filling the array with the pointer to the string
-    map[idx] = dest;
-
-    idx++;
-  }
-
-  fclose(fptr);
-
-  return map;
+  return hashmap;
 }

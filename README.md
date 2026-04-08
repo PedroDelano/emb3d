@@ -12,7 +12,7 @@ Embeddings model from scratch in C.
   - [x] Load vocab file and count tokens
   - [x] Constructing a linked list
   - [x] Build hash map (string → int)
-  - [ ] Build token-to-ID map (string → int)
+  - [x] Build token-to-ID map (string → int)
   - [ ] Encode function (string → int ID)
   - [ ] Decode function (int ID → string)
   - [ ] Tokenize raw text (split + encode)

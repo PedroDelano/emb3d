@@ -1,6 +1,8 @@
 #ifndef TOKENIZER_H
 #define TOKENIZER_H
 
-char **generate_token_map(char *fpath);
+#include "hashmap.h"
+
+Node **generate_token_map(char *fpath);
 
 #endif
