@@ -15,5 +15,4 @@ Node *create_ll();
 Node *insert_ll(Node *head, Node *n);
 int search_ll(Node *head, char *str);
 
-
 #endif

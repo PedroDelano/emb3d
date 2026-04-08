@@ -17,7 +17,7 @@ const int MAX_TOKEN_SIZE = 255;
 
 /*********************************************
  * TOKENIZER IMPLEMENTATION
-*********************************************/
+ *********************************************/
 
 char **generate_token_map(char *fpath) {
   // this function will return an array

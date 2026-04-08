@@ -1,6 +1,6 @@
 #include "linalg.h"
-#include "matrix.h"
 #include "linkedlist.h"
+#include "matrix.h"
 #include "tokenizer.h"
 #include <stdio.h>
 

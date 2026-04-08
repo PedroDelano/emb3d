@@ -6,13 +6,13 @@
  * */
 
 #include "linkedlist.h"
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
 
-Node *create_ll(){
-  // we need to allocate memory for 
+Node *create_ll() {
+  // we need to allocate memory for
   // the struct to be able to use it
   // outside the function.
   Node *head = malloc(sizeof(Node));
