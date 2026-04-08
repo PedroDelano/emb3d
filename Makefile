@@ -1,11 +1,11 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -std=c11 -Iinclude
-SRC = src/main.c src/matrix.c src/linalg.c src/utils.c src/tokenizer.c
+SRC = src/main.c src/matrix.c src/linalg.c src/utils.c src/tokenizer.c src/linkedlist.c
 OUT = build/emb3d
 
 all: $(OUT)
 
-$(OUT): $(SRC) include/matrix.h include/linalg.h include/utils.h include/tokenizer.h
+$(OUT): $(SRC) include/matrix.h include/linalg.h include/utils.h include/tokenizer.h include/linkedlist.h
 	@mkdir -p build
 	$(CC) $(CFLAGS) -o $(OUT) $(SRC)
 

@@ -10,6 +10,8 @@ Embeddings model from scratch in C.
 - [x] Dot product
 - [ ] Tokenizer (map text to integer IDs)
   - [x] Load vocab file and count tokens
+  - [x] Constructing a linked list
+  - [ ] Build hash map (string → int)
   - [ ] Build token-to-ID map (string → int)
   - [ ] Encode function (string → int ID)
   - [ ] Decode function (int ID → string)

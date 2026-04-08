@@ -15,6 +15,10 @@
 // A token can only have 256 letters
 const int MAX_TOKEN_SIZE = 255;
 
+/*********************************************
+ * TOKENIZER IMPLEMENTATION
+*********************************************/
+
 char **generate_token_map(char *fpath) {
   // this function will return an array
   // that maps an integer to (a pointer of) a string
@@ -27,7 +31,6 @@ char **generate_token_map(char *fpath) {
   int n_tokens = 0;
   while (fgets(buffer, 255, fptr)) {
     n_tokens++;
-    // printf("%s", buffer);
   }
 
   assert(n_tokens > 0 && "empty vocab file");

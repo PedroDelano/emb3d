@@ -1,11 +1,26 @@
 #include "linalg.h"
 #include "matrix.h"
+#include "linkedlist.h"
 #include "tokenizer.h"
 #include <stdio.h>
 
 int main(void) {
 
   generate_token_map("data/vocab.txt");
+
+  Node *head = create_ll();
+  struct Data d1 = {"hello", 42};
+  head->data = d1;
+  printf("ll created at %p\n", (void *)head);
+
+  struct Data d2 = {"world", 69};
+  Node *n1 = create_ll();
+  n1->data = d2;
+  head = insert_ll(head, n1);
+
+  int index = search_ll(head, "hello");
+  printf("Index for %s is %d", "hello", index);
+
   return 0;
 
   matrix *a = matrix_new_eye(4);
