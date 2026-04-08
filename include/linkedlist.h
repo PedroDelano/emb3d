@@ -11,7 +11,7 @@ typedef struct Node {
   struct Node *next;
 } Node;
 
-Node *create_ll();
+Node *create_node();
 Node *insert_ll(Node *head, Node *n);
 int search_ll(Node *head, char *str);
 

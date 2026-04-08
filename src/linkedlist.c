@@ -11,7 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-Node *create_ll() {
+Node *create_node() {
   // we need to allocate memory for
   // the struct to be able to use it
   // outside the function.
@@ -40,6 +40,6 @@ int search_ll(Node *head, char *str) {
     }
     curr = curr->next;
   }
-  printf("ERROR: str not found");
+  printf("ERROR: str not found\n");
   return -1;
 }

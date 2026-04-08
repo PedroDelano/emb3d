@@ -1,3 +1,4 @@
+#include "hashmap.h"
 #include "linalg.h"
 #include "linkedlist.h"
 #include "matrix.h"
@@ -6,20 +7,37 @@
 
 int main(void) {
 
-  generate_token_map("data/vocab.txt");
+  Node **hashmap = hashmap_start();
 
-  Node *head = create_ll();
+  // check non-existent string;
+  char *query = "hello";
+  int idx = hashmap_retrieve(hashmap, query);
+  printf("The idx of %s is %d ----- \n", query, idx);
+
+  hashmap_insert(hashmap, query);
+  idx = hashmap_retrieve(hashmap, query);
+  printf("The idx of %s is %d ------- \n", query, idx);
+
+  return 0;
+
+  generate_token_map("data/vocab.txt");
+  unsigned int h1 = hash("ab");
+  unsigned int h2 = hash("ba");
+  printf("Hash for %s is %d << \n", "ab", h1);
+  printf("Hash for %s is %d << \n", "ba", h2);
+
+  Node *head = create_node();
   struct Data d1 = {"hello", 42};
   head->data = d1;
   printf("ll created at %p\n", (void *)head);
 
   struct Data d2 = {"world", 69};
-  Node *n1 = create_ll();
+  Node *n1 = create_node();
   n1->data = d2;
   head = insert_ll(head, n1);
 
   int index = search_ll(head, "hello");
-  printf("Index for %s is %d", "hello", index);
+  printf("Index for %s is %d\n", "hello", index);
 
   return 0;
 
