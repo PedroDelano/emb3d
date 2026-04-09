@@ -16,7 +16,7 @@ Embeddings model from scratch in C.
   - [x] Encode function (string → int ID)
   - [x] Decode function (int ID → string)
   - [x] Tokenize raw text (split + encode)
-- [ ] Vocabulary builder
+- [x] Vocabulary builder
 - [ ] Embedding lookup table (matrix of token vectors)
 - [ ] Forward pass (token → embedding vector)
 - [ ] Loss function (e.g. cosine similarity, negative sampling)
