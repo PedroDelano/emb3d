@@ -7,6 +7,7 @@
  * an integer - encode)
  * */
 
+#include "tokenizer.h"
 #include "hashmap.h"
 #include <assert.h>
 #include <stdio.h>
@@ -18,7 +19,7 @@ const int MAX_TOKEN_SIZE = 255;
 const char *UNKOWN_TOKEN = "<unk>";
 
 /*********************************************
- * TOKENIZER IMPLEMENTATION
+ * TOKENIZER MAP
  *********************************************/
 
 Node **generate_token_map(char *fpath) {
@@ -57,6 +58,10 @@ Node **generate_token_map(char *fpath) {
   return hashmap;
 }
 
+/*********************************************
+ * TOKENIZER ENCODERS AND DECODERS
+ *********************************************/
+
 int tk_encode(Node **token_map, char *value) {
   return hashmap_retrieve(token_map, value);
 }
@@ -70,4 +75,78 @@ char *tk_decode(Node **token_map, int token_id) {
     }
   }
   return (char *)UNKOWN_TOKEN;
+}
+
+Array *tokenize(char *str) {
+  size_t str_size = strlen(str);
+
+  // We need to allocate the empty word to be able to
+  // change it (append chars to it)
+  char *_word = (char *)malloc(MAX_TOKEN_SIZE * sizeof(char));
+  strcpy(_word, "");
+
+  // Here we allocate our dynamic array
+  int arr_size = 2;
+  char **arr_data = (char **)malloc(arr_size * sizeof(char *));
+
+  Array *arr = (Array *)malloc(sizeof(Array));
+  arr->data = arr_data;
+  arr->count = 0;
+  arr->size = arr_size;
+
+  for (size_t i = 0; i < str_size; i++) {
+
+    if (str[i] == ' ') {
+
+      // the word reached the end
+      // we need to append the word
+      // to the array
+      if (arr->count == arr->size) {
+        // increase size
+        arr->size = arr->size * 2;
+        arr->data = (char **)realloc(arr->data, arr->size * sizeof(char *));
+      }
+
+      // allocate the memory for the word
+      // so that we can change the value of
+      // _word without changing the contents
+      // of arr.data
+      size_t word_len = strlen(_word) + 1;
+      char *w = (char *)malloc(word_len);
+      strcpy(w, _word);
+
+      arr->data[arr->count] = w;
+      arr->count++;
+      strcpy(_word, "");
+
+      continue;
+    }
+
+    // append character
+    _word = strncat(_word, &str[i], 1);
+  }
+
+  if (strlen(_word) > 0) {
+    if (arr->count == arr->size) {
+      arr->size = arr->size * 2;
+      arr->data = (char **)realloc(arr->data, arr->size * sizeof(char *));
+    }
+
+    size_t word_len = strlen(_word) + 1;
+    char *w = (char *)malloc(word_len);
+    strcpy(w, _word);
+
+    arr->data[arr->count] = w;
+    arr->count++;
+    strcpy(_word, "");
+  }
+
+  // we are done with _word so we better
+  // free the memory
+  free(_word);
+
+  // set the actual final size
+  arr->size = arr->count;
+
+  return arr;
 }

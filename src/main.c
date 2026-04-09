@@ -14,10 +14,15 @@ int main(void) {
   char *dec = tk_decode(hashmap, enc);
   printf("The idx of %s is %d ----- \n", dec, enc);
 
-  query = "meaning";
+  query = "hello";
   enc = tk_encode(hashmap, query);
   dec = tk_decode(hashmap, enc);
   printf("The idx of %s is %d ----- \n", dec, enc);
+
+  Array *tokens = tokenize("The good, the bad and the ugly.");
+  for (size_t i = 0; i < tokens->size; i++) {
+    printf("%s\n", tokens->data[i]);
+  }
 
   return 0;
 }
