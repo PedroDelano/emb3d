@@ -65,7 +65,7 @@ char *tk_decode(Node **token_map, int token_id) {
   // Linear search through hashmap structure
   for (int i = 0; i < SLOT_SIZE; i++) {
     char *s = search_ll_by_index(token_map[i], token_id);
-    if (strcmp(s, UNKOWN_TOKEN) != 0) {
+    if (s != NULL) {
       return s;
     }
   }
