@@ -8,14 +8,14 @@ Embeddings model from scratch in C.
 - [x] Matrix operations (add, subtract, scalar multiply, transpose)
 - [x] Matrix multiplication
 - [x] Dot product
-- [ ] Tokenizer (map text to integer IDs)
+- [x] Tokenizer (map text to integer IDs)
   - [x] Load vocab file and count tokens
   - [x] Constructing a linked list
   - [x] Build hash map (string → int)
   - [x] Build token-to-ID map (string → int)
   - [x] Encode function (string → int ID)
   - [x] Decode function (int ID → string)
-  - [ ] Tokenize raw text (split + encode)
+  - [x] Tokenize raw text (split + encode)
 - [ ] Vocabulary builder
 - [ ] Embedding lookup table (matrix of token vectors)
 - [ ] Forward pass (token → embedding vector)
