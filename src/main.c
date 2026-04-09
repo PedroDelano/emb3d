@@ -1,8 +1,4 @@
 #include "embedding.h"
-#include "hashmap.h"
-#include "linalg.h"
-#include "linkedlist.h"
-#include "matrix.h"
 #include "tokenizer.h"
 #include <stdio.h>
 
@@ -20,6 +16,8 @@ int main(void) {
 
   matrix *emb = embedding_matrix_new(get_vocab_size(VOCAB_PATH));
   matrix_print(emb);
+
+  double *vec = embedding_retrieve(emb, enc);
 
   return 0;
 }
