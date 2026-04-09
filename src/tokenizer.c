@@ -24,6 +24,19 @@ const char *PUNCTUATION = "!@#$%&*(),.?;";
  * TOKENIZER MAP
  *********************************************/
 
+unsigned int get_vocab_size(char *fpath) {
+  FILE *fptr;
+  char buffer[MAX_TOKEN_SIZE];
+  fptr = fopen(fpath, "r");
+  assert(fptr != NULL && "Could not open file.");
+  unsigned int n_tokens = 0;
+  while (fgets(buffer, 255, fptr)) {
+    n_tokens++;
+  }
+  fclose(fptr);
+  return n_tokens;
+}
+
 Node **generate_token_map(char *fpath) {
   // this function will return an array
   // that maps an integer to (a pointer of) a string
@@ -56,6 +69,7 @@ Node **generate_token_map(char *fpath) {
   }
 
   assert(n_tokens > 0 && "empty vocab file");
+  fclose(fptr);
 
   return hashmap;
 }

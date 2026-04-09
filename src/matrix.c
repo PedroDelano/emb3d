@@ -72,6 +72,21 @@ matrix *matrix_new_sqr(unsigned int n) {
   return matrix_new(n, n);
 }
 
+matrix *matrix_new_rand(unsigned int num_rows, unsigned int num_cols) {
+
+  matrix *m = matrix_new(num_rows, num_cols);
+
+  for (unsigned int i = 0; i < num_rows; i++) {
+    for (unsigned int j = 0; j < num_cols; j++) {
+      // defines a value between 0 and 1
+      double val = (double)rand() / (double)RAND_MAX;
+      m->data[i][j] = val;
+    }
+  }
+
+  return m;
+}
+
 matrix *matrix_new_eye(unsigned int n) {
   // Creates an identity matrix
   matrix *m = matrix_new(n, n);
