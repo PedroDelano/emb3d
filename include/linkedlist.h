@@ -14,5 +14,6 @@ typedef struct Node {
 Node *create_node();
 Node *insert_ll(Node *head, Node *n);
 int search_ll(Node *head, char *str);
+char *search_ll_by_index(Node *head, int idx);
 
 #endif

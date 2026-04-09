@@ -15,6 +15,7 @@
 
 // A token can only have 256 letters
 const int MAX_TOKEN_SIZE = 255;
+const char *UNKOWN_TOKEN = "<unk>";
 
 /*********************************************
  * TOKENIZER IMPLEMENTATION
@@ -47,11 +48,26 @@ Node **generate_token_map(char *fpath) {
     strcpy(dest, buffer);
 
     // insert string in hashmap
-    hashmap_insert(hashmap, dest);
+    hashmap_insert(hashmap, dest, n_tokens);
     n_tokens++;
   }
 
   assert(n_tokens > 0 && "empty vocab file");
 
   return hashmap;
+}
+
+int tk_encode(Node **token_map, char *value) {
+  return hashmap_retrieve(token_map, value);
+}
+
+char *tk_decode(Node **token_map, int token_id) {
+  // Linear search through hashmap structure
+  for (int i = 0; i < SLOT_SIZE; i++) {
+    char *s = search_ll_by_index(token_map[i], token_id);
+    if (strcmp(s, UNKOWN_TOKEN) != 0) {
+      return s;
+    }
+  }
+  return (char *)UNKOWN_TOKEN;
 }

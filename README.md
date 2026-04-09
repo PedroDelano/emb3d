@@ -13,8 +13,8 @@ Embeddings model from scratch in C.
   - [x] Constructing a linked list
   - [x] Build hash map (string → int)
   - [x] Build token-to-ID map (string → int)
-  - [ ] Encode function (string → int ID)
-  - [ ] Decode function (int ID → string)
+  - [x] Encode function (string → int ID)
+  - [x] Decode function (int ID → string)
   - [ ] Tokenize raw text (split + encode)
 - [ ] Vocabulary builder
 - [ ] Embedding lookup table (matrix of token vectors)

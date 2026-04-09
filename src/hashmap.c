@@ -43,20 +43,20 @@ Node **hashmap_start() {
   return hashmap;
 }
 
-void hashmap_insert(Node **hashmap, char *str) {
+void hashmap_insert(Node **hashmap, char *str, int idx) {
 
   // retrieving the index from a given string
-  int index = hash(str);
-  assert(index < SLOT_SIZE && "index is greater than SLOT_SIZE");
+  int str_h = hash(str);
+  assert(str_h < SLOT_SIZE && "index is greater than SLOT_SIZE");
 
   // creating the linked list node to be inserted
   Node *n = create_node();
-  struct Data d = {str, index};
+  struct Data d = {str, idx};
   n->data = d;
 
   // inserting it
-  Node *head = insert_ll(hashmap[index], n);
-  hashmap[index] = head;
+  Node *head = insert_ll(hashmap[str_h], n);
+  hashmap[str_h] = head;
 }
 
 int hashmap_retrieve(Node **hashmap, char *str) {

@@ -40,6 +40,19 @@ int search_ll(Node *head, char *str) {
     }
     curr = curr->next;
   }
-  printf("ERROR: str not found\n");
+  // printf("ERROR: str not found\n");
   return -1;
+}
+
+char *search_ll_by_index(Node *head, int idx) {
+  // we are trying to find the str in Data
+  Node *curr = head;
+  while (curr) {
+    if (curr->data.idx == idx) {
+      return curr->data.str;
+    }
+    curr = curr->next;
+  }
+  // printf("ERROR: str not found\n");
+  return "<unk>";
 }
