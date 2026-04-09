@@ -9,19 +9,11 @@ int main(void) {
 
   Node **hashmap = generate_token_map("data/vocab.txt");
 
-  char *query = "bug";
-  int enc = tk_encode(hashmap, query);
-  char *dec = tk_decode(hashmap, enc);
-  printf("The idx of %s is %d ----- \n", dec, enc);
-
-  query = "hello";
-  enc = tk_encode(hashmap, query);
-  dec = tk_decode(hashmap, enc);
-  printf("The idx of %s is %d ----- \n", dec, enc);
-
-  Array *tokens = tokenize("The good, the bad and the ugly.");
+  Array *tokens = tokenize("The good, the bad and the ugly. Spare me none!");
   for (size_t i = 0; i < tokens->size; i++) {
-    printf("%s\n", tokens->data[i]);
+    int enc = tk_encode(hashmap, tokens->data[i]);
+    char *dec = tk_decode(hashmap, enc);
+    printf("%s --> %d --> %s\n", tokens->data[i], enc, dec);
   }
 
   return 0;
