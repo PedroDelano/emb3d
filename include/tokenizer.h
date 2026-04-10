@@ -2,6 +2,7 @@
 #define TOKENIZER_H
 
 #include "hashmap.h"
+#include "linkedlist.h"
 #include <stdlib.h>
 
 typedef struct Array {

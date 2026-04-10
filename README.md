@@ -18,13 +18,22 @@ Embeddings model from scratch in C.
   - [x] Tokenize raw text (split + encode)
 - [x] Vocabulary builder
 - [x] Embedding lookup table (matrix of token vectors)
-- [x] Forward pass (token → embedding vector)
-- [ ] Loss function (e.g. cosine similarity, negative sampling)
+- [x] Embedding lookup (token → embedding vector)
+- [ ] Forward pass (context words → next-word prediction)
+  - [x] Combine input token embeddings into a single context vector
+  - [ ] Multiply embedding matrix by context vector → scores (vocab_size × 1)
+  - [ ] Softmax over scores → probability distribution
+- [ ] Loss function (cross-entropy: -log(probability of target word))
 - [ ] Backpropagation / gradient computation
-- [ ] Weight update (SGD or similar)
+  - [ ] Gradient of softmax + cross-entropy (predicted - actual)
+  - [ ] Gradient with respect to embedding weights
+- [ ] Weight update (SGD: weight = weight - learning_rate × gradient)
 - [ ] Training loop
+  - [ ] Build training pairs from text (context window → next word)
+  - [ ] Iterate over data, forward pass → loss → backward pass → update
 - [ ] Save / load model weights
 - [ ] Inference (text → embedding vector)
+- [ ] Evaluate with cosine similarity (do similar words cluster?)
 
 ## Build
 

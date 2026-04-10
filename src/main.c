@@ -5,19 +5,15 @@
 int main(void) {
 
   char *VOCAB_PATH = "data/vocab.txt";
-  Node **hashmap = generate_token_map(VOCAB_PATH);
+  Node **token_map = generate_token_map(VOCAB_PATH);
+  matrix *embedding_matrix = embedding_matrix_new(get_vocab_size(VOCAB_PATH));
 
-  Array *tokens = tokenize("The good, the bad and the ugly. Spare me none!");
-  for (size_t i = 0; i < tokens->size; i++) {
-    int enc = tk_encode(hashmap, tokens->data[i]);
-    char *dec = tk_decode(hashmap, enc);
-    printf("%s --> %d --> %s\n", tokens->data[i], enc, dec);
+  char *query = "the good, the bad, the ugly.";
+  double *vec = embedding(embedding_matrix, token_map, query);
+
+  for (int i = 0; i < (int)EMBEDDING_SIZE; i++) {
+    printf("%.2f / ", vec[i]);
   }
-
-  matrix *emb = embedding_matrix_new(get_vocab_size(VOCAB_PATH));
-  matrix_print(emb);
-
-  double *vec = embedding_retrieve(emb, enc);
 
   return 0;
 }
