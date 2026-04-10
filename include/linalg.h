@@ -9,5 +9,7 @@ matrix *matrix_scalar_mult(matrix *a, float value);
 matrix *matrix_transpose(matrix *a);
 matrix *matrix_mult(matrix *a, matrix *b);
 double dot_product(matrix *a, matrix *b);
+matrix *softmax(matrix *m, int apply_rowwise);
+double cross_entropy_loss(matrix *logits, int token_id);
 
 #endif

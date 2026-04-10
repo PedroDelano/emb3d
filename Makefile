@@ -7,7 +7,7 @@ all: $(OUT)
 
 $(OUT): $(SRC) include/matrix.h include/linalg.h include/utils.h include/tokenizer.h include/linkedlist.h include/hashmap.h include/embedding.h
 	@mkdir -p build
-	$(CC) $(CFLAGS) -o $(OUT) $(SRC)
+	$(CC) $(CFLAGS) -o $(OUT) $(SRC) -lm
 
 run: $(OUT)
 	./$(OUT)

@@ -22,8 +22,9 @@ Embeddings model from scratch in C.
 - [ ] Forward pass (context words → next-word prediction)
   - [x] Combine input token embeddings into a single context vector
   - [ ] Multiply embedding matrix by context vector → scores (vocab_size × 1)
-  - [ ] Softmax over scores → probability distribution
-- [ ] Loss function (cross-entropy: -log(probability of target word))
+  - [x] Softmax over scores → probability distribution
+    - [ ] Numerical stability (subtract max before exp)
+- [x] Loss function (cross-entropy: -log(probability of target word))
 - [ ] Backpropagation / gradient computation
   - [ ] Gradient of softmax + cross-entropy (predicted - actual)
   - [ ] Gradient with respect to embedding weights

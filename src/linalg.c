@@ -1,6 +1,7 @@
 #include "linalg.h"
 #include "matrix.h"
 #include <assert.h>
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -106,4 +107,51 @@ double dot_product(matrix *a, matrix *b) {
   assert(dp->num_rows == 1);
   assert(dp->num_cols == 1);
   return dp->data[0][0];
+}
+
+/*********************************************************
+ * ACTIVATION FUNCTION
+ ********************************************************/
+
+matrix *softmax(matrix *m, int apply_rowwise) {
+
+  assert((apply_rowwise == 1 || apply_rowwise == 0) &&
+         "ERROR: invalid apply_rowwise value");
+
+  if (apply_rowwise == 1) {
+
+    for (unsigned int j = 0; j < m->num_cols; j++) {
+      double row_sum = 0;
+      for (unsigned int i = 0; i < m->num_rows; i++) {
+        row_sum += exp(m->data[i][j]);
+      }
+      for (unsigned int i = 0; i < m->num_rows; i++) {
+        m->data[i][j] = exp(m->data[i][j]) / row_sum;
+      }
+    }
+
+  } else {
+
+    for (unsigned int i = 0; i < m->num_rows; i++) {
+      double row_col = 0;
+      for (unsigned int j = 0; j < m->num_cols; j++) {
+        row_col += exp(m->data[i][j]);
+      }
+      for (unsigned int j = 0; j < m->num_cols; j++) {
+        m->data[i][j] = exp(m->data[i][j]) / row_col;
+      }
+    }
+  }
+
+  return m;
+}
+
+/*********************************************************
+ * LOSS FUNCTION
+ ********************************************************/
+
+double cross_entropy_loss(matrix *logits, int token_id) {
+  assert(logits->num_cols == 1 && "ERROR: logits must be a column-vector");
+  double prob = logits->data[token_id][0];
+  return (-1) * log(prob);
 }

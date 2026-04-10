@@ -67,6 +67,22 @@ matrix *matrix_copy(matrix *a) {
   return r;
 }
 
+matrix *matrix_to_row_vec(double *vec, int vec_size) {
+  matrix *m = matrix_new(1, vec_size);
+  for (int i = 0; i < vec_size; i++) {
+    m->data[0][i] = vec[i];
+  }
+  return m;
+}
+
+matrix *matrix_to_col_vec(double *vec, int vec_size) {
+  matrix *m = matrix_new(vec_size, 1);
+  for (int i = 0; i < vec_size; i++) {
+    m->data[i][0] = vec[i];
+  }
+  return m;
+}
+
 matrix *matrix_new_sqr(unsigned int n) {
   // Creates a square matrix N x N
   return matrix_new(n, n);

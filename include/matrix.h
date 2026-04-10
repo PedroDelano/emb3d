@@ -15,5 +15,7 @@ matrix *matrix_new_eye(unsigned int n);
 matrix *matrix_copy(matrix *a);
 void matrix_free(matrix *m);
 void matrix_print(const matrix *m);
+matrix *matrix_to_row_vec(double *vec, int vec_size);
+matrix *matrix_to_col_vec(double *vec, int vec_size);
 
 #endif
