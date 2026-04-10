@@ -133,12 +133,12 @@ matrix *softmax(matrix *m, int apply_rowwise) {
   } else {
 
     for (unsigned int i = 0; i < m->num_rows; i++) {
-      double row_col = 0;
+      double col_sum = 0;
       for (unsigned int j = 0; j < m->num_cols; j++) {
-        row_col += exp(m->data[i][j]);
+        col_sum += exp(m->data[i][j]);
       }
       for (unsigned int j = 0; j < m->num_cols; j++) {
-        m->data[i][j] = exp(m->data[i][j]) / row_col;
+        m->data[i][j] = exp(m->data[i][j]) / col_sum;
       }
     }
   }

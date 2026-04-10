@@ -20,7 +20,15 @@ double *embedding_retrieve(matrix *embedding_matrix, int token_id) {
   return embedding_matrix->data[token_id];
 }
 
-double *embedding(matrix *embedding_matrix, Node **token_map, char *str) {
+matrix *one_hot_encoding(int index, int size) {
+  // Returns a [0, 0, 1, ..., 0] vector
+  // where x[index] = 1
+  matrix *m = matrix_new(1, size);
+  m->data[0][index] = 1;
+  return m;
+}
+
+matrix *embedding(matrix *embedding_matrix, Node **token_map, char *str) {
 
   /*
    * Simple embedding implementation via averaging
@@ -55,5 +63,6 @@ double *embedding(matrix *embedding_matrix, Node **token_map, char *str) {
     emb_vec[j] = emb_vec[j] / tokens->size;
   }
 
-  return emb_vec;
+  matrix *vec = matrix_to_col_vec(emb_vec, EMBEDDING_SIZE);
+  return vec;
 }

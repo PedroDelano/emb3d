@@ -1,5 +1,6 @@
 #include "matrix.h"
 #include "utils.h"
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -113,6 +114,10 @@ matrix *matrix_new_eye(unsigned int n) {
 }
 
 void matrix_print(const matrix *m) {
+
+  assert(m->num_rows > 0);
+  assert(m->num_cols > 0);
+
   unsigned int disp_rows = min(m->num_rows, MAX_DISPLAY_ROWS);
   unsigned int disp_cols = min(m->num_cols, MAX_DISPLAY_COLUMNS);
   int trunc_rows = m->num_rows > (unsigned int)MAX_DISPLAY_ROWS;
@@ -132,7 +137,7 @@ void matrix_print(const matrix *m) {
   for (unsigned int i = 0; i < disp_rows; i++) {
     printf("%5u ", i);
     for (unsigned int j = 0; j < disp_cols; j++) {
-      printf("%9.2f", m->data[i][j]);
+      printf("%9.4f", m->data[i][j]);
     }
     if (trunc_cols) {
       printf("      ...");

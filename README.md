@@ -19,15 +19,16 @@ Embeddings model from scratch in C.
 - [x] Vocabulary builder
 - [x] Embedding lookup table (matrix of token vectors)
 - [x] Embedding lookup (token → embedding vector)
-- [ ] Forward pass (context words → next-word prediction)
+- [x] Forward pass (context words → next-word prediction)
   - [x] Combine input token embeddings into a single context vector
-  - [ ] Multiply embedding matrix by context vector → scores (vocab_size × 1)
+  - [x] Multiply embedding matrix by context vector → scores (vocab_size × 1)
   - [x] Softmax over scores → probability distribution
     - [ ] Numerical stability (subtract max before exp)
 - [x] Loss function (cross-entropy: -log(probability of target word))
 - [ ] Backpropagation / gradient computation
   - [ ] Gradient of softmax + cross-entropy (predicted - actual)
   - [ ] Gradient with respect to embedding weights
+    - [ ] Review: https://web.eecs.umich.edu/~justincj/teaching/eecs498/FA2020/linear-backprop.html
 - [ ] Weight update (SGD: weight = weight - learning_rate × gradient)
 - [ ] Training loop
   - [ ] Build training pairs from text (context window → next word)
