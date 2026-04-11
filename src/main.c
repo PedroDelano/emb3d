@@ -6,7 +6,7 @@
 int main(void) {
 
   char *VOCAB_FILE = "data/vocab_small.txt";
-  char *TRAIN_FILE = "data/train.txt";
+  char *TRAIN_FILE = "data/train_small.txt";
   const int WINDOW_SIZE = 3;
 
   Node **token_map = generate_token_map(VOCAB_FILE);

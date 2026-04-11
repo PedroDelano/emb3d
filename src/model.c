@@ -5,7 +5,7 @@
 #include <assert.h>
 #include <stdio.h>
 
-const double LEARNING_RATE = 0.001;
+const double LEARNING_RATE = 0.01;
 const int EPOCHS = 3;
 
 matrix *forward_pass(matrix *embedding_matrix, matrix *embedding_vector) {
