@@ -17,5 +17,7 @@ void matrix_free(matrix *m);
 void matrix_print(const matrix *m);
 matrix *matrix_to_row_vec(double *vec, int vec_size);
 matrix *matrix_to_col_vec(double *vec, int vec_size);
+int matrix_save(matrix *m, const char *fpath);
+matrix *matrix_load(const char *fpath);
 
 #endif

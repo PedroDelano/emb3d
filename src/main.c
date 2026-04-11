@@ -3,20 +3,16 @@
 #include "model.h"
 #include "tokenizer.h"
 #include <stdio.h>
+#include <string.h>
 
-int main(void) {
+void print_usage(char *prog) {
+  printf("Usage:\n");
+  printf("  %s train <vocab> <data> <window_size> <emb_size> <output_model>\n", prog);
+  printf("  %s eval <vocab> <model>\n", prog);
+  printf("  %s similar <vocab> <model> <word_a> <word_b>\n", prog);
+}
 
-  char *VOCAB_FILE = "data/vocab_small.txt";
-  char *TRAIN_FILE = "data/train_small.txt";
-  const int WINDOW_SIZE = 3;
-
-  Node **token_map = generate_token_map(VOCAB_FILE);
-  matrix *embedding_matrix = embedding_matrix_new(get_vocab_size(VOCAB_FILE));
-
-  embedding_matrix =
-      train(token_map, embedding_matrix, TRAIN_FILE, WINDOW_SIZE);
-
-  // Similar pairs
+void run_eval(Node **token_map, matrix *embedding_matrix) {
   char *similar[][2] = {
       {"machine", "learning"},    {"sentiment", "analysis"},
       {"neural", "network"},      {"good", "excellent"},
@@ -24,7 +20,6 @@ int main(void) {
       {"statistical", "methods"}, {"text", "language"},
   };
 
-  // Dissimilar pairs
   char *dissimilar[][2] = {
       {"hotel", "neural"},      {"food", "parsing"},
       {"anger", "algorithms"},  {"machine", "food"},
@@ -62,6 +57,92 @@ int main(void) {
            sim);
     matrix_free(vec_a);
     matrix_free(vec_b);
+  }
+}
+
+int main(int argc, char *argv[]) {
+
+  if (argc < 2) {
+    print_usage(argv[0]);
+    return 1;
+  }
+
+  char *cmd = argv[1];
+
+  if (strcmp(cmd, "train") == 0) {
+    if (argc < 7) {
+      printf("Usage: %s train <vocab> <data> <window_size> <emb_size> <output_model>\n", argv[0]);
+      return 1;
+    }
+    char *vocab = argv[2];
+    char *data = argv[3];
+    int window_size = atoi(argv[4]);
+    int emb_size = atoi(argv[5]);
+    char *output = argv[6];
+
+    embedding_set_size(emb_size);
+    Node **token_map = generate_token_map(vocab);
+    matrix *embedding_matrix = embedding_matrix_new(get_vocab_size(vocab));
+
+    embedding_matrix = train(token_map, embedding_matrix, data, window_size);
+
+    if (matrix_save(embedding_matrix, output) == 0) {
+      printf("Model saved to %s\n", output);
+    } else {
+      printf("Error saving model\n");
+      return 1;
+    }
+
+  } else if (strcmp(cmd, "eval") == 0) {
+    if (argc < 4) {
+      printf("Usage: %s eval <vocab> <model>\n", argv[0]);
+      return 1;
+    }
+    char *vocab = argv[2];
+    char *model_path = argv[3];
+
+    Node **token_map = generate_token_map(vocab);
+    matrix *embedding_matrix = matrix_load(model_path);
+    if (embedding_matrix == NULL) {
+      printf("Error loading model from %s\n", model_path);
+      return 1;
+    }
+    embedding_set_size(embedding_matrix->num_cols);
+
+    run_eval(token_map, embedding_matrix);
+
+  } else if (strcmp(cmd, "similar") == 0) {
+    if (argc < 6) {
+      printf("Usage: %s similar <vocab> <model> <word_a> <word_b>\n", argv[0]);
+      return 1;
+    }
+    char *vocab = argv[2];
+    char *model_path = argv[3];
+    char *word_a = argv[4];
+    char *word_b = argv[5];
+
+    Node **token_map = generate_token_map(vocab);
+    matrix *embedding_matrix = matrix_load(model_path);
+    if (embedding_matrix == NULL) {
+      printf("Error loading model from %s\n", model_path);
+      return 1;
+    }
+    embedding_set_size(embedding_matrix->num_cols);
+
+    int id_a = tk_encode(token_map, word_a);
+    int id_b = tk_encode(token_map, word_b);
+    matrix *vec_a = matrix_to_col_vec(
+        embedding_retrieve(embedding_matrix, id_a), EMBEDDING_SIZE);
+    matrix *vec_b = matrix_to_col_vec(
+        embedding_retrieve(embedding_matrix, id_b), EMBEDDING_SIZE);
+    double sim = cosine_similarity(vec_a, vec_b);
+    printf("%.4f\n", sim);
+    matrix_free(vec_a);
+    matrix_free(vec_b);
+
+  } else {
+    print_usage(argv[0]);
+    return 1;
   }
 
   return 0;

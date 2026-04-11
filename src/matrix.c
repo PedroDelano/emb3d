@@ -153,8 +153,31 @@ void matrix_print(const matrix *m) {
 }
 
 // ************************************************************
-// MATRIX FILE FORMAT
+// MATRIX FILE FORMAT (binary: rows, cols, then row-major doubles)
 // ************************************************************
 
-// void matrix_to_file(){}
-// matrix *matrix_from_file(){}
+int matrix_save(matrix *m, const char *fpath) {
+  FILE *f = fopen(fpath, "wb");
+  if (f == NULL) return -1;
+  fwrite(&m->num_rows, sizeof(unsigned int), 1, f);
+  fwrite(&m->num_cols, sizeof(unsigned int), 1, f);
+  for (unsigned int i = 0; i < m->num_rows; i++) {
+    fwrite(m->data[i], sizeof(double), m->num_cols, f);
+  }
+  fclose(f);
+  return 0;
+}
+
+matrix *matrix_load(const char *fpath) {
+  FILE *f = fopen(fpath, "rb");
+  if (f == NULL) return NULL;
+  unsigned int rows, cols;
+  fread(&rows, sizeof(unsigned int), 1, f);
+  fread(&cols, sizeof(unsigned int), 1, f);
+  matrix *m = matrix_new(rows, cols);
+  for (unsigned int i = 0; i < rows; i++) {
+    fread(m->data[i], sizeof(double), cols, f);
+  }
+  fclose(f);
+  return m;
+}

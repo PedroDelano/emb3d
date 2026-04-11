@@ -91,7 +91,7 @@ matrix *train(Node **token_map, matrix *embedding_matrix, char *fpath,
     window->size = window_size;
 
     for (size_t i = 0; i < (tokens->count - 1); i++) {
-      if (i % 50 == 0 && i > 0) {
+      if (i % 100 == 0 && i > 0) {
         printf("[Epoch %d / %d] Running %d out of %d / Loss = %.5f\n", epoch,
                EPOCHS, (int)i, (int)tokens->count, loss_sum / i);
       }
@@ -107,7 +107,6 @@ matrix *train(Node **token_map, matrix *embedding_matrix, char *fpath,
 
       target = tk_encode(token_map, tokens->data[i + 1]);
       loss_sum += cross_entropy_loss(logits, target);
-      // printf("\t[DEBUG] Loss = %.5f\n", loss_sum);
 
       embedding_matrix = backprop(embedding_matrix, emb, logits, target);
 
