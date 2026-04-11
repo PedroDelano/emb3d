@@ -7,7 +7,7 @@
 
 void print_usage(char *prog) {
   printf("Usage:\n");
-  printf("  %s train <vocab> <data> <window_size> <emb_size> <output_model>\n", prog);
+  printf("  %s train <vocab> <data> <window_size> <emb_size> <lr> <epochs> <output_model>\n", prog);
   printf("  %s eval <vocab> <model>\n", prog);
   printf("  %s similar <vocab> <model> <word_a> <word_b>\n", prog);
 }
@@ -70,15 +70,17 @@ int main(int argc, char *argv[]) {
   char *cmd = argv[1];
 
   if (strcmp(cmd, "train") == 0) {
-    if (argc < 7) {
-      printf("Usage: %s train <vocab> <data> <window_size> <emb_size> <output_model>\n", argv[0]);
+    if (argc < 9) {
+      printf("Usage: %s train <vocab> <data> <window_size> <emb_size> <lr> <epochs> <output_model>\n", argv[0]);
       return 1;
     }
     char *vocab = argv[2];
     char *data = argv[3];
     int window_size = atoi(argv[4]);
     int emb_size = atoi(argv[5]);
-    char *output = argv[6];
+    LEARNING_RATE = atof(argv[6]);
+    EPOCHS = atoi(argv[7]);
+    char *output = argv[8];
 
     embedding_set_size(emb_size);
     Node **token_map = generate_token_map(vocab);

@@ -9,52 +9,53 @@
  * BASIC MATRIX OPERATIONS
  ***************************************************/
 
-matrix *matrix_add(matrix *a, matrix *b) {
+void matrix_add_r(matrix *a, matrix *b) {
+  for (unsigned int i = 0; i < a->num_rows; i++) {
+    for (unsigned int j = 0; j < a->num_cols; j++) {
+      a->data[i][j] = a->data[i][j] + b->data[i][j];
+    }
+  }
+}
 
+matrix *matrix_add(matrix *a, matrix *b) {
   if (a->num_rows != b->num_rows || a->num_cols != b->num_cols) {
     printf("ERROR: cannot add matrices of different sizes");
     return NULL;
   }
+  matrix *c = matrix_copy(a);
+  matrix_add_r(c, b);
+  return c;
+}
 
-  matrix *c = matrix_new(a->num_rows, a->num_cols);
-
+void matrix_sub_r(matrix *a, matrix *b) {
   for (unsigned int i = 0; i < a->num_rows; i++) {
     for (unsigned int j = 0; j < a->num_cols; j++) {
-      c->data[i][j] = a->data[i][j] + b->data[i][j];
+      a->data[i][j] = a->data[i][j] - b->data[i][j];
     }
   }
-
-  return c;
 }
 
 matrix *matrix_sub(matrix *a, matrix *b) {
-
   if (a->num_rows != b->num_rows || a->num_cols != b->num_cols) {
-    printf("ERROR: cannot add matrices of different sizes");
+    printf("ERROR: cannot subtract matrices of different sizes");
     return NULL;
   }
-
-  matrix *c = matrix_new(a->num_rows, a->num_cols);
-
-  for (unsigned int i = 0; i < a->num_rows; i++) {
-    for (unsigned int j = 0; j < a->num_cols; j++) {
-      c->data[i][j] = a->data[i][j] - b->data[i][j];
-    }
-  }
-
+  matrix *c = matrix_copy(a);
+  matrix_sub_r(c, b);
   return c;
 }
 
-matrix *matrix_scalar_mult(matrix *a, float value) {
-
-  matrix *r = matrix_new(a->num_rows, a->num_cols);
-
+void matrix_scalar_mult_r(matrix *a, float value) {
   for (unsigned int i = 0; i < a->num_rows; i++) {
     for (unsigned int j = 0; j < a->num_cols; j++) {
-      r->data[i][j] = a->data[i][j] * value;
+      a->data[i][j] = a->data[i][j] * value;
     }
   }
+}
 
+matrix *matrix_scalar_mult(matrix *a, float value) {
+  matrix *r = matrix_copy(a);
+  matrix_scalar_mult_r(r, value);
   return r;
 }
 

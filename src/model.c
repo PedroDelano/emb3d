@@ -5,8 +5,8 @@
 #include <assert.h>
 #include <stdio.h>
 
-const double LEARNING_RATE = 0.01;
-const int EPOCHS = 3;
+double LEARNING_RATE = 0.01;
+int EPOCHS = 3;
 
 matrix *forward_pass(matrix *embedding_matrix, matrix *embedding_vector) {
   // return the logits
@@ -20,31 +20,24 @@ matrix *backprop(matrix *embedding_matrix, matrix *embedding_vector,
 
   int vocab_size = embedding_matrix->num_rows;
 
-  // calculating the dL/dz
+  // calculating the dL/dz = (ŷ - y)
   matrix *y = one_hot_encoding(correct_token_index, vocab_size);
-  matrix *ydiff = matrix_sub(forw_pass, y);
+  matrix_sub_r(forw_pass, y);
 
-  // dL/dw = dL/dz * dz/dw
-  // dL/dz = (ŷ - y)
-  // Since z = W * a
-  // dz/dw = a
-  // Then dL/dw = (ŷ - y) * a
+  // dL/dw = dL/dz * dz/dw = (ŷ - y) * a^T
   matrix *emb_t = matrix_transpose(embedding_vector);
-  matrix *dl_dz = matrix_mult(ydiff, emb_t);
-  matrix *grad_desc = matrix_scalar_mult(dl_dz, LEARNING_RATE);
+  matrix *grad = matrix_mult(forw_pass, emb_t);
+  matrix_scalar_mult_r(grad, LEARNING_RATE);
 
-  // Updating the embedding matrix
-  matrix *new_embedding_matrix = matrix_sub(embedding_matrix, grad_desc);
+  // W = W - lr * gradient
+  matrix_sub_r(embedding_matrix, grad);
 
   // Freeing some memory
   matrix_free(y);
-  matrix_free(ydiff);
   matrix_free(emb_t);
-  matrix_free(grad_desc);
-  matrix_free(embedding_matrix);
-  matrix_free(dl_dz);
+  matrix_free(grad);
 
-  return new_embedding_matrix;
+  return embedding_matrix;
 }
 
 matrix *train(Node **token_map, matrix *embedding_matrix, char *fpath,
