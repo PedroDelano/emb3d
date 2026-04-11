@@ -33,9 +33,9 @@ Embeddings model from scratch in C.
 - [x] Training loop
   - [x] Build training pairs from text (context window → next word)
   - [x] Iterate over data, forward pass → loss → backward pass → update
-- [ ] Save / load model weights
+- [x] Evaluate with cosine similarity (do similar words cluster?)
 - [ ] Inference (text → embedding vector)
-- [ ] Evaluate with cosine similarity (do similar words cluster?)
+- [ ] Save / load model weights
 
 ## Build
 

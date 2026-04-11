@@ -102,11 +102,32 @@ matrix *matrix_mult(matrix *a, matrix *b) {
 double dot_product(matrix *a, matrix *b) {
   assert(a->num_rows == 1 && "a must be a (1, N) matrix");
   assert(b->num_cols == 1 && "b must be a (N, 1) matrix");
-
   matrix *dp = matrix_mult(a, b);
   assert(dp->num_rows == 1);
   assert(dp->num_cols == 1);
-  return dp->data[0][0];
+  double dp_value = dp->data[0][0];
+  matrix_free(dp);
+  return dp_value;
+}
+
+double vec_norm(matrix *a) {
+  double sum = 0;
+  for (unsigned int i = 0; i < a->num_rows; i++) {
+    for (unsigned int j = 0; j < a->num_cols; j++) {
+      sum += a->data[i][j] * a->data[i][j];
+    }
+  }
+  return sqrt(sum);
+}
+
+double cosine_similarity(matrix *a, matrix *b) {
+  matrix *a_t = matrix_transpose(a);
+  double dp = dot_product(a_t, b);
+  double norm_a = vec_norm(a);
+  double norm_b = vec_norm(b);
+  double cosim = dp / (norm_a * norm_b);
+  matrix_free(a_t);
+  return cosim;
 }
 
 /*********************************************************
