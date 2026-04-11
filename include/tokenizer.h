@@ -5,6 +5,8 @@
 #include "linkedlist.h"
 #include <stdlib.h>
 
+extern const int MAX_TOKEN_SIZE;
+
 typedef struct Array {
   char **data;
   size_t count;
@@ -16,5 +18,8 @@ int tk_encode(Node **token_map, char *value);
 char *tk_decode(Node **token_map, int token_id);
 Array *tokenize(char *str);
 unsigned int get_vocab_size(char *fpath);
+
+Array *pop_from_array(Array *arr);
+Array *add_to_array(Array *arr, char *str);
 
 #endif

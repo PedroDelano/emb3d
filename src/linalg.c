@@ -50,7 +50,7 @@ matrix *matrix_scalar_mult(matrix *a, float value) {
   matrix *r = matrix_new(a->num_rows, a->num_cols);
 
   for (unsigned int i = 0; i < a->num_rows; i++) {
-    for (unsigned int j = 0; j < a->num_rows; j++) {
+    for (unsigned int j = 0; j < a->num_cols; j++) {
       r->data[i][j] = a->data[i][j] * value;
     }
   }
@@ -122,11 +122,18 @@ matrix *softmax(matrix *m, int apply_rowwise) {
 
     for (unsigned int j = 0; j < m->num_cols; j++) {
       double row_sum = 0;
+      double max = -99999;
+      double zi = 0;
       for (unsigned int i = 0; i < m->num_rows; i++) {
-        row_sum += exp(m->data[i][j]);
+        zi = m->data[i][j];
+        if (zi > max)
+          max = zi;
       }
       for (unsigned int i = 0; i < m->num_rows; i++) {
-        m->data[i][j] = exp(m->data[i][j]) / row_sum;
+        row_sum += exp(m->data[i][j] - max);
+      }
+      for (unsigned int i = 0; i < m->num_rows; i++) {
+        m->data[i][j] = exp(m->data[i][j] - max) / row_sum;
       }
     }
 
@@ -134,11 +141,18 @@ matrix *softmax(matrix *m, int apply_rowwise) {
 
     for (unsigned int i = 0; i < m->num_rows; i++) {
       double col_sum = 0;
+      double max = -99999;
+      double zi = 0;
       for (unsigned int j = 0; j < m->num_cols; j++) {
-        col_sum += exp(m->data[i][j]);
+        zi = m->data[i][j];
+        if (zi > max)
+          max = zi;
       }
       for (unsigned int j = 0; j < m->num_cols; j++) {
-        m->data[i][j] = exp(m->data[i][j]) / col_sum;
+        col_sum += exp(m->data[i][j] - max);
+      }
+      for (unsigned int j = 0; j < m->num_cols; j++) {
+        m->data[i][j] = exp(m->data[i][j] - max) / col_sum;
       }
     }
   }

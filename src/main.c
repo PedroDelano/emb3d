@@ -5,15 +5,15 @@
 
 int main(void) {
 
-  char *VOCAB_PATH = "data/vocab.txt";
-  Node **token_map = generate_token_map(VOCAB_PATH);
-  matrix *embedding_matrix = embedding_matrix_new(get_vocab_size(VOCAB_PATH));
+  char *VOCAB_FILE = "data/vocab_small.txt";
+  char *TRAIN_FILE = "data/train.txt";
+  const int WINDOW_SIZE = 3;
 
-  char *query = "the good, the bad, the ugly.";
-  matrix *vec = embedding(embedding_matrix, token_map, query);
+  Node **token_map = generate_token_map(VOCAB_FILE);
+  matrix *embedding_matrix = embedding_matrix_new(get_vocab_size(VOCAB_FILE));
 
-  matrix *fp = forward_pass(embedding_matrix, vec);
-  matrix_print(fp);
+  embedding_matrix =
+      train(token_map, embedding_matrix, TRAIN_FILE, WINDOW_SIZE);
 
   return 0;
 }

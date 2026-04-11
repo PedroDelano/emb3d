@@ -8,7 +8,7 @@
 #include "tokenizer.h"
 #include <assert.h>
 
-const unsigned int EMBEDDING_SIZE = 1024;
+const unsigned int EMBEDDING_SIZE = 32;
 
 matrix *embedding_matrix_new(unsigned int vocab_size) {
   return matrix_new_rand(vocab_size, EMBEDDING_SIZE);
@@ -23,19 +23,17 @@ double *embedding_retrieve(matrix *embedding_matrix, int token_id) {
 matrix *one_hot_encoding(int index, int size) {
   // Returns a [0, 0, 1, ..., 0] vector
   // where x[index] = 1
-  matrix *m = matrix_new(1, size);
-  m->data[0][index] = 1;
+  matrix *m = matrix_new(size, 1);
+  m->data[index][0] = 1;
   return m;
 }
 
-matrix *embedding(matrix *embedding_matrix, Node **token_map, char *str) {
+matrix *embedding(matrix *embedding_matrix, Node **token_map, Array *tokens) {
 
   /*
    * Simple embedding implementation via averaging
    * embedding vectors
    * */
-
-  Array *tokens = tokenize(str);
 
   // allocating memory for a vector of doubles
   double *emb_vec = malloc(EMBEDDING_SIZE * sizeof(double));

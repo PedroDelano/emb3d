@@ -17,7 +17,7 @@
 
 // A token can only have 256 letters
 const int MAX_TOKEN_SIZE = 255;
-const char *UNKOWN_TOKEN = "<unk>";
+const char *UNKOWN_TOKEN = "[UNK]";
 const char *PUNCTUATION = "!@#$%&*(),.?;";
 
 /*********************************************
@@ -78,10 +78,6 @@ Node **generate_token_map(char *fpath) {
  * TOKENIZER ENCODERS AND DECODERS
  *********************************************/
 
-int tk_encode(Node **token_map, char *value) {
-  return hashmap_retrieve(token_map, value);
-}
-
 char *tk_decode(Node **token_map, int token_id) {
   // Linear search through hashmap structure
   for (int i = 0; i < SLOT_SIZE; i++) {
@@ -91,6 +87,31 @@ char *tk_decode(Node **token_map, int token_id) {
     }
   }
   return (char *)UNKOWN_TOKEN;
+}
+
+int tk_encode(Node **token_map, char *value) {
+  int token = hashmap_retrieve(token_map, value);
+  if (token == -1) {
+    return tk_encode(token_map, (char *)UNKOWN_TOKEN);
+  }
+  return token;
+}
+
+Array *pop_from_array(Array *arr) {
+  // remove the first element and shift
+
+  if (arr->count == 0)
+    return arr;
+
+  free(arr->data[0]);
+  arr->data[0] = NULL;
+
+  for (size_t i = 0; i < (arr->count - 1); i++) {
+    arr->data[i] = arr->data[i + 1];
+  }
+
+  arr->count = arr->count - 1;
+  return arr;
 }
 
 Array *add_to_array(Array *arr, char *str) {
