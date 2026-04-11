@@ -14,17 +14,17 @@ void print_usage(char *prog) {
 
 void run_eval(Node **token_map, matrix *embedding_matrix) {
   char *similar[][2] = {
-      {"machine", "learning"},    {"sentiment", "analysis"},
-      {"neural", "network"},      {"good", "excellent"},
-      {"data", "datasets"},       {"supervised", "unsupervised"},
-      {"statistical", "methods"}, {"text", "language"},
+      {"king", "war"},          {"north", "south"},
+      {"gold", "silver"},       {"dog", "cat"},
+      {"school", "book"},       {"government", "political"},
+      {"music", "song"},        {"science", "natural"},
   };
 
   char *dissimilar[][2] = {
-      {"hotel", "neural"},      {"food", "parsing"},
-      {"anger", "algorithms"},  {"machine", "food"},
-      {"hotel", "statistical"}, {"anger", "data"},
-      {"praise", "computing"},  {"disgust", "optimization"},
+      {"dog", "building"},      {"music", "mountain"},
+      {"king", "fish"},         {"gold", "water"},
+      {"school", "fire"},       {"car", "church"},
+      {"film", "tree"},         {"war", "song"},
   };
 
   int num_similar = 8;

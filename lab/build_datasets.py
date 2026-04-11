@@ -1,17 +1,20 @@
 from datasets import load_dataset
+import random
 import re
 import sys
+
+random.seed(42)
 
 sizes = [5, 10, 20, 50, 100, 1000, 5000]
 
 dataset = load_dataset("wikimedia/wikipedia", "20231101.en", split="train", streaming=True)
 
-# Collect all articles up to the max size
-max_size = max(sizes)
-articles = []
+# Download a pool larger than we need, then sample from it
+POOL_SIZE = 50000
+pool = []
 
 for i, article in enumerate(dataset):
-    if i >= max_size:
+    if i >= POOL_SIZE:
         break
 
     text = article["text"]
@@ -20,15 +23,17 @@ for i, article in enumerate(dataset):
     text = text.strip()
 
     if len(text) > 100:
-        articles.append(text)
+        pool.append(text)
 
-    if (i + 1) % 500 == 0:
+    if (i + 1) % 5000 == 0:
         print(f"Downloaded {i + 1} articles")
 
-print(f"Downloaded {len(articles)} articles total")
+print(f"Pool: {len(pool)} articles")
+
+random.shuffle(pool)
 
 for size in sizes:
-    subset = articles[:size]
+    subset = pool[:size]
 
     # Write training data
     data_path = f"../data/train_{size}.txt"
