@@ -76,6 +76,7 @@ matrix *train(Node **token_map, matrix *embedding_matrix, char *fpath,
   Array *window = (Array *)malloc(sizeof(Array));
 
   int target = -1;
+  double avg_loss = 0;
 
   for (int epoch = 1; epoch < EPOCHS + 1; epoch++) {
 
@@ -92,8 +93,14 @@ matrix *train(Node **token_map, matrix *embedding_matrix, char *fpath,
 
     for (size_t i = 0; i < (tokens->count - 1); i++) {
       if (i % 100 == 0 && i > 0) {
+        avg_loss = loss_sum / i;
         printf("[Epoch %d / %d] Running %d out of %d / Loss = %.5f\n", epoch,
-               EPOCHS, (int)i, (int)tokens->count, loss_sum / i);
+               EPOCHS, (int)i, (int)tokens->count, avg_loss);
+      }
+
+      if (avg_loss > 0 && avg_loss < 1e-1) {
+        printf("EARLY STOP: Stopped at average loss = %.5f\n", avg_loss);
+        return embedding_matrix;
       }
 
       window = add_to_array(window, tokens->data[i]);
