@@ -80,6 +80,7 @@ matrix *matrix_mult(matrix *a, matrix *b) {
 
   matrix *r = matrix_new(a->num_rows, b->num_cols);
 
+#pragma omp parallel for schedule(static)
   for (unsigned int i = 0; i < a->num_rows; i++) {
     for (unsigned int j = 0; j < b->num_cols; j++) {
 
