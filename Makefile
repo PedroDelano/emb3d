@@ -10,12 +10,15 @@ $(OUT): $(SRC) include/matrix.h include/linalg.h include/utils.h include/tokeniz
 	$(CC) $(CFLAGS) -o $(OUT) $(SRC) -lm
 
 run: $(OUT)
-	./$(OUT)
+	./$(OUT) $(ARGS)
 
 format:
 	clang-format -i $(SRC) include/*.h
 
+profile: run
+	gprof $(OUT) gmon.out
+
 clean:
 	rm -rf build
 
-.PHONY: all run format clean
+.PHONY: all run format clean profile

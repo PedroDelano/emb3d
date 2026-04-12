@@ -8,6 +8,57 @@
 double LEARNING_RATE = 0.01;
 int EPOCHS = 3;
 
+void eval_pairs(Node **token_map, matrix *embedding_matrix) {
+  char *similar[][2] = {
+      {"north", "south"},         {"school", "education"},
+      {"computer", "network"},    {"science", "research"},
+      {"country", "city"},        {"government", "political"},
+      {"language", "english"},    {"university", "school"},
+  };
+
+  char *dissimilar[][2] = {
+      {"music", "water"},         {"gold", "building"},
+      {"war", "art"},             {"car", "church"},
+      {"film", "fire"},           {"science", "car"},
+      {"north", "music"},         {"computer", "church"},
+  };
+
+  int num_similar = 8;
+  int num_dissimilar = 8;
+
+  double avg_similar = 0.0;
+  for (int i = 0; i < num_similar; i++) {
+    int id_a = tk_encode(token_map, similar[i][0]);
+    int id_b = tk_encode(token_map, similar[i][1]);
+    matrix *vec_a = matrix_to_col_vec(
+        embedding_retrieve(embedding_matrix, id_a), EMBEDDING_SIZE);
+    matrix *vec_b = matrix_to_col_vec(
+        embedding_retrieve(embedding_matrix, id_b), EMBEDDING_SIZE);
+    double sim = cosine_similarity(vec_a, vec_b);
+    avg_similar += sim;
+    matrix_free(vec_a);
+    matrix_free(vec_b);
+  }
+  avg_similar /= num_similar;
+  printf("\tSimilar pais average: %.4f\n", avg_similar);
+
+  double avg_dissimilar = 0.0;
+  for (int i = 0; i < num_dissimilar; i++) {
+    int id_a = tk_encode(token_map, dissimilar[i][0]);
+    int id_b = tk_encode(token_map, dissimilar[i][1]);
+    matrix *vec_a = matrix_to_col_vec(
+        embedding_retrieve(embedding_matrix, id_a), EMBEDDING_SIZE);
+    matrix *vec_b = matrix_to_col_vec(
+        embedding_retrieve(embedding_matrix, id_b), EMBEDDING_SIZE);
+    double sim = cosine_similarity(vec_a, vec_b);
+    avg_dissimilar += sim;
+    matrix_free(vec_a);
+    matrix_free(vec_b);
+  }
+  avg_dissimilar /= num_dissimilar;
+  printf("\tDissimilar pais average: %.4f\n", avg_dissimilar);
+}
+
 matrix *forward_pass(matrix *embedding_matrix, matrix *embedding_vector) {
   // return the logits
   matrix *m = matrix_mult(embedding_matrix, embedding_vector);
@@ -75,6 +126,8 @@ matrix *train(Node **token_map, matrix *embedding_matrix, char *fpath,
 
     // loss per epoch
     double loss_sum = 0;
+    double last_loss_sum = 0;
+    double loss_diff = 0;
 
     // Initialize the window array
     if (epoch > 1)
@@ -84,11 +137,16 @@ matrix *train(Node **token_map, matrix *embedding_matrix, char *fpath,
     window->count = 0;
     window->size = window_size;
 
+    int unk = tk_encode(token_map, (char*)UNKOWN_TOKEN);
+
     for (size_t i = 0; i < (tokens->count - 1); i++) {
-      if (i % 100 == 0 && i > 0) {
+      if (i % 5000 == 0 && i > 0) {
         avg_loss = loss_sum / i;
-        printf("[Epoch %d / %d] Running %d out of %d / Loss = %.5f\n", epoch,
-               EPOCHS, (int)i, (int)tokens->count, avg_loss);
+        loss_diff = 100* (1 - (loss_sum / last_loss_sum));
+        printf("[Epoch %d / %d] Running %d out of %d / Loss = %.5f / Loss Decr. = %.3f %% \n", epoch,
+               EPOCHS, (int)i, (int)tokens->count, avg_loss, loss_diff);
+        last_loss_sum = loss_sum;
+        eval_pairs(token_map, embedding_matrix);
       }
 
       if (avg_loss > 0 && avg_loss < 1e-1) {
@@ -106,8 +164,15 @@ matrix *train(Node **token_map, matrix *embedding_matrix, char *fpath,
       matrix *logits = forward_pass(embedding_matrix, emb);
 
       target = tk_encode(token_map, tokens->data[i + 1]);
-      loss_sum += cross_entropy_loss(logits, target);
 
+      if (target == unk) {
+        matrix_free(emb);
+        matrix_free(logits);
+        window = pop_from_array(window);
+        continue;
+      }
+
+      loss_sum += cross_entropy_loss(logits, target);
       embedding_matrix = backprop(embedding_matrix, emb, logits, target);
 
       matrix_free(emb);
@@ -115,6 +180,7 @@ matrix *train(Node **token_map, matrix *embedding_matrix, char *fpath,
 
       window = pop_from_array(window);
     }
+
   }
 
   fclose(fptr);

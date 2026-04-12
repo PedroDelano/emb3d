@@ -15,7 +15,7 @@
 // The number of available slots to fill
 // the map. After 1024 it will reuse hashes
 // and we need to use linked list search
-const int SLOT_SIZE = 1024;
+const int SLOT_SIZE = 10240;
 
 // The MULTIPLIER should be a prime number
 // so that we avoid dividing the SLOT_SIZE

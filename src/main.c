@@ -14,22 +14,23 @@ void print_usage(char *prog) {
 
 void run_eval(Node **token_map, matrix *embedding_matrix) {
   char *similar[][2] = {
-      {"king", "war"},          {"north", "south"},
-      {"gold", "silver"},       {"dog", "cat"},
-      {"school", "book"},       {"government", "political"},
-      {"music", "song"},        {"science", "natural"},
+      {"north", "south"},         {"school", "education"},
+      {"computer", "network"},    {"science", "research"},
+      {"country", "city"},        {"government", "political"},
+      {"language", "english"},    {"university", "school"},
   };
 
   char *dissimilar[][2] = {
-      {"dog", "building"},      {"music", "mountain"},
-      {"king", "fish"},         {"gold", "water"},
-      {"school", "fire"},       {"car", "church"},
-      {"film", "tree"},         {"war", "song"},
+      {"music", "water"},         {"gold", "building"},
+      {"war", "art"},             {"car", "church"},
+      {"film", "fire"},           {"science", "car"},
+      {"north", "music"},         {"computer", "church"},
   };
 
   int num_similar = 8;
   int num_dissimilar = 8;
 
+  double avg_similar = 0.0;
   printf("\n=== Similar Pairs ===\n");
   for (int i = 0; i < num_similar; i++) {
     int id_a = tk_encode(token_map, similar[i][0]);
@@ -39,11 +40,15 @@ void run_eval(Node **token_map, matrix *embedding_matrix) {
     matrix *vec_b = matrix_to_col_vec(
         embedding_retrieve(embedding_matrix, id_b), EMBEDDING_SIZE);
     double sim = cosine_similarity(vec_a, vec_b);
+    avg_similar += sim;
     printf("  %-15s vs %-15s = %.4f\n", similar[i][0], similar[i][1], sim);
     matrix_free(vec_a);
     matrix_free(vec_b);
   }
+  avg_similar /= num_similar;
+  printf("  Average: %.4f\n", avg_similar);
 
+  double avg_dissimilar = 0.0;
   printf("\n=== Dissimilar Pairs ===\n");
   for (int i = 0; i < num_dissimilar; i++) {
     int id_a = tk_encode(token_map, dissimilar[i][0]);
@@ -53,11 +58,14 @@ void run_eval(Node **token_map, matrix *embedding_matrix) {
     matrix *vec_b = matrix_to_col_vec(
         embedding_retrieve(embedding_matrix, id_b), EMBEDDING_SIZE);
     double sim = cosine_similarity(vec_a, vec_b);
+    avg_dissimilar += sim;
     printf("  %-15s vs %-15s = %.4f\n", dissimilar[i][0], dissimilar[i][1],
            sim);
     matrix_free(vec_a);
     matrix_free(vec_b);
   }
+  avg_dissimilar /= num_dissimilar;
+  printf("  Average: %.4f\n", avg_dissimilar);
 }
 
 int main(int argc, char *argv[]) {
