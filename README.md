@@ -51,47 +51,66 @@ Requires `gcc` and `make`.
 
 ```
 # Train a model
-./emb3d train <vocab> <data> <window_size> <emb_size> <output_model>
-./emb3d train data/vocab_small.txt data/train_small.txt 3 32 data/model.bin
+./emb3d train <vocab> <data> <window_size> <emb_size> <lr> <epochs> <output_model>
+./emb3d train data/vocab_atomic.txt data/train_20000.txt 3 64 0.01 1 output/model_e64_vAtomic.bin
 
 # Evaluate with predefined word pairs
 ./emb3d eval <vocab> <model>
-./emb3d eval data/vocab_small.txt data/model.bin
+./emb3d eval data/vocab_atomic.txt output/model_e64_vAtomic.bin
 
 # Check similarity between two words
 ./emb3d similar <vocab> <model> <word_a> <word_b>
-./emb3d similar data/vocab_small.txt data/model.bin machine learning
+./emb3d similar data/vocab_atomic.txt output/model_e64_vAtomic.bin software hardware
 ```
 
-## Results (small model)
+## Evaluation
 
-Trained on 3 Wikipedia articles (~810 tokens), 404-word vocab, embedding size 32, window size 3, 3 epochs. Loss: 5.94 → 0.002.
+The model is evaluated by measuring cosine similarity between word pairs that should be semantically similar (e.g. software/hardware, linux/kernel) and pairs that should be dissimilar (e.g. software/river, linux/ocean). Each group reports a mean and standard deviation.
+
+To determine whether the model has learned meaningful distinctions, we compute a compatibility score:
+
+```
+sigma = sqrt(std_similar^2 + std_dissimilar^2)
+compatibility = (avg_similar - avg_dissimilar) / sigma
+```
+
+This is the separation between the two group means measured in units of their combined uncertainty. A compatibility score above **2** means the separation is statistically significant — the model reliably places similar words closer together than dissimilar ones, beyond what random variation would explain.
+
+## Results
+
+Trained on 20,000 tech-filtered Wikipedia articles (~14.4M tokens), 25-word atomic vocab, embedding size 64, window size 3, 1 epoch. Loss: 0.018.
 
 ### Similar Pairs
 | Word A | Word B | Cosine Similarity |
 |--------|--------|:-:|
-| machine | learning | 0.8710 |
-| sentiment | analysis | 0.8198 |
-| supervised | unsupervised | 0.8164 |
-| statistical | methods | 0.7109 |
-| data | datasets | 0.7025 |
-| text | language | 0.6966 |
-| neural | network | 0.6883 |
-| good | excellent | 0.6307 |
+| software | hardware | 0.9022 |
+| algorithm | data | 0.7859 |
+| network | internet | 0.8875 |
+| server | database | 0.8502 |
+| linux | kernel | 0.8701 |
+| encryption | security | 0.7893 |
+| processor | memory | 0.7756 |
+| code | programming | 0.7671 |
 
 ### Dissimilar Pairs
 | Word A | Word B | Cosine Similarity |
 |--------|--------|:-:|
-| hotel | statistical | 0.7832 |
-| machine | food | 0.7505 |
-| anger | data | 0.7348 |
-| hotel | neural | 0.7344 |
-| disgust | optimization | 0.7269 |
-| food | parsing | 0.7153 |
-| praise | computing | 0.6864 |
-| anger | algorithms | 0.6481 |
+| software | river | 0.6696 |
+| algorithm | painting | 0.6408 |
+| network | forest | 0.6555 |
+| server | mountain | 0.7464 |
+| linux | ocean | 0.6862 |
+| encryption | garden | 0.6329 |
+| processor | novel | 0.7537 |
+| code | weather | 0.6287 |
 
-Similar pairs average **0.73**, dissimilar pairs average **0.72**. The gap is narrow due to the tiny training set — with more data the separation should improve.
+```
+Similar pairs:    0.8287 ± 0.0514
+Dissimilar pairs: 0.6769 ± 0.0459
+Compatibility:    2.2047 (sep=0.1519, σ=0.0689)
+```
+
+At **2.2σ**, the model shows statistically significant separation between similar and dissimilar word pairs.
 
 ## References
 - https://www.andreinc.net/2021/01/20/writing-your-own-linear-algebra-matrix-library-in-c/#disclaimer
