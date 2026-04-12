@@ -168,7 +168,10 @@ Array *tokenize(char *str) {
       continue;
     }
 
-    // append character
+    // append character, flush if _word is full
+    if (strlen(_word) >= (size_t)MAX_TOKEN_SIZE - 2) {
+      arr = add_to_array(arr, _word);
+    }
     char lower_str = tolower(str[i]);
     _word = strncat(_word, &lower_str, 1);
   }
