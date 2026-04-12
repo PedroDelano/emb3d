@@ -80,6 +80,10 @@ This is the separation between the two group means measured in units of their co
 
 Trained on 20,000 tech-filtered Wikipedia articles (~14.4M tokens), 25-word atomic vocab, embedding size 64, window size 3, 1 epoch. Loss: 0.018.
 
+```bash
+make && ./build/emb3d train data/vocab_atomic.txt data/train_20000.txt 3 64 0.01 1 output/model_e64_vAtomic.bin
+```
+
 ### Similar Pairs
 | Word A | Word B | Cosine Similarity |
 |--------|--------|:-:|
