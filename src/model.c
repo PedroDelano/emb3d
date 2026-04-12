@@ -40,7 +40,7 @@ void eval_pairs(Node **token_map, matrix *embedding_matrix) {
     matrix_free(vec_b);
   }
   avg_similar /= num_similar;
-  printf("\tSimilar pais average: %.4f\n", avg_similar);
+  printf("\tSimilar pairs average: %.4f\n", avg_similar);
 
   double avg_dissimilar = 0.0;
   for (int i = 0; i < num_dissimilar; i++) {
@@ -56,7 +56,7 @@ void eval_pairs(Node **token_map, matrix *embedding_matrix) {
     matrix_free(vec_b);
   }
   avg_dissimilar /= num_dissimilar;
-  printf("\tDissimilar pais average: %.4f\n", avg_dissimilar);
+  printf("\tDissimilar pairs average: %.4f\n", avg_dissimilar);
 }
 
 matrix *forward_pass(matrix *embedding_matrix, matrix *embedding_vector) {
@@ -129,6 +129,10 @@ matrix *train(Node **token_map, matrix *embedding_matrix, char *fpath,
     double last_loss_sum = 0;
     double loss_diff = 0;
 
+    // token-miss
+    int token_miss = 0;
+    double token_miss_rate = 0;
+
     // Initialize the window array
     if (epoch > 1)
       free(window->data);
@@ -141,10 +145,11 @@ matrix *train(Node **token_map, matrix *embedding_matrix, char *fpath,
 
     for (size_t i = 0; i < (tokens->count - 1); i++) {
       if (i % 5000 == 0 && i > 0) {
+        token_miss_rate = 100.0 * token_miss / i;
         avg_loss = loss_sum / i;
         loss_diff = 100* (1 - (loss_sum / last_loss_sum));
-        printf("[Epoch %d / %d] Running %d out of %d / Loss = %.5f / Loss Decr. = %.3f %% \n", epoch,
-               EPOCHS, (int)i, (int)tokens->count, avg_loss, loss_diff);
+        printf("[Epoch %d / %d] Running %d out of %d / Loss = %.5f (%.3f %%) / Tk. Miss = %.1f %% \n", epoch,
+               EPOCHS, (int)i, (int)tokens->count, avg_loss, loss_diff, token_miss_rate);
         last_loss_sum = loss_sum;
         eval_pairs(token_map, embedding_matrix);
       }
@@ -166,6 +171,7 @@ matrix *train(Node **token_map, matrix *embedding_matrix, char *fpath,
       target = tk_encode(token_map, tokens->data[i + 1]);
 
       if (target == unk) {
+        token_miss++;
         matrix_free(emb);
         matrix_free(logits);
         window = pop_from_array(window);
