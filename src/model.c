@@ -1,3 +1,4 @@
+#include "utils.h"
 #include "embedding.h"
 #include "linalg.h"
 #include "matrix.h"
@@ -6,6 +7,7 @@
 #include <assert.h>
 #include <math.h>
 #include <stdio.h>
+#include <string.h>
 
 double LEARNING_RATE = 0.01;
 int EPOCHS = 3;
@@ -109,7 +111,7 @@ matrix *backprop(matrix *embedding_matrix, matrix *embedding_vector,
 }
 
 matrix *train(Node **token_map, matrix *embedding_matrix, char *fpath,
-              int window_size) {
+              int window_size, char *output) {
 
   assert(window_size > 0);
 
@@ -135,6 +137,24 @@ matrix *train(Node **token_map, matrix *embedding_matrix, char *fpath,
 
   // Define window_size array
   Array *window = (Array *)malloc(sizeof(Array));
+
+  // Define the checkpoint file as .bin.ckpt
+  char *ext = ".ckpt\0";
+  size_t len = strlen(output) + strlen(ext) + 1;
+  char *chpt = malloc(len);
+  strcpy(chpt, output);
+  strcat(chpt, ext);
+
+  // Checking if checkpoint exists
+  // TODO: Add the starting point (the index 
+  // where we stopped) to train starting from
+  // the correct place instead of restarting
+  if (file_exists(chpt) == 1) {
+    printf("Reading embedding matrix from checkpoint at %s\n", chpt);
+    embedding_matrix = matrix_load(chpt);
+  } else {
+    printf("No checkpoint was found, starting from scratch\n");
+  }
 
   int target = -1;
   double avg_loss = 0;
@@ -171,6 +191,8 @@ matrix *train(Node **token_map, matrix *embedding_matrix, char *fpath,
         last_avg_loss = avg_loss;
         eval_pairs(token_map, embedding_matrix);
         printf("\tCurrent LR = %.5f\n", lr);
+        matrix_save(embedding_matrix, chpt);
+        printf("\tSaved checkpoint at %s\n", chpt);
       }
 
       if (avg_loss > 0 && avg_loss < 1e-3) {

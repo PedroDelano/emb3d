@@ -94,7 +94,7 @@ int main(int argc, char *argv[]) {
     Node **token_map = generate_token_map(vocab);
     matrix *embedding_matrix = embedding_matrix_new(get_vocab_size(vocab));
 
-    embedding_matrix = train(token_map, embedding_matrix, data, window_size);
+    embedding_matrix = train(token_map, embedding_matrix, data, window_size, output);
 
     if (matrix_save(embedding_matrix, output) == 0) {
       printf("Model saved to %s\n", output);

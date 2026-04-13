@@ -9,6 +9,6 @@ extern int EPOCHS;
 
 matrix *forward_pass(matrix *embedding_matrix, matrix *embedding_vector);
 matrix *train(Node **token_map, matrix *embedding_matrix, char *fpath,
-              int window_size);
+              int window_size, char *output);
 
 #endif
