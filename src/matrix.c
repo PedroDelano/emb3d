@@ -1,5 +1,6 @@
 #include "matrix.h"
 #include "utils.h"
+#include <math.h>
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -89,7 +90,9 @@ matrix *matrix_new_sqr(unsigned int n) {
   return matrix_new(n, n);
 }
 
-matrix *matrix_new_rand(unsigned int num_rows, unsigned int num_cols) {
+matrix *matrix_new_rand(unsigned int num_rows, unsigned int num_cols, int norm) {
+
+  assert(norm == 1 || norm == 0);
 
   matrix *m = matrix_new(num_rows, num_cols);
 
@@ -98,6 +101,26 @@ matrix *matrix_new_rand(unsigned int num_rows, unsigned int num_cols) {
       // defines a value between 0 and 1
       double val = (double)rand() / (double)RAND_MAX;
       m->data[i][j] = val;
+    }
+  }
+
+  if (norm == 0) {
+    return m;
+  }
+
+  double row_sum = 0;
+
+  // row-wise normalization
+  for (unsigned int i = 0; i < num_rows; i++) {
+    row_sum = 0;
+    for (unsigned int j = 0; j < num_cols; j++) {
+      row_sum += m->data[i][j] * m->data[i][j];
+    }
+    if (row_sum == 0) {
+      continue;
+    }
+    for (unsigned int j = 0; j < num_cols; j++) {
+      m->data[i][j] = m->data[i][j] / sqrt(row_sum);
     }
   }
 

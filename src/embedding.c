@@ -15,7 +15,7 @@ void embedding_set_size(unsigned int size) {
 }
 
 matrix *embedding_matrix_new(unsigned int vocab_size) {
-  return matrix_new_rand(vocab_size, EMBEDDING_SIZE);
+  return matrix_new_rand(vocab_size, EMBEDDING_SIZE, 1);
 }
 
 double *embedding_retrieve(matrix *embedding_matrix, int token_id) {
