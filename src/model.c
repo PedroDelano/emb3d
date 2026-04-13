@@ -2,6 +2,7 @@
 #include "linalg.h"
 #include "matrix.h"
 #include "tokenizer.h"
+#include "learning_rate.h"
 #include <assert.h>
 #include <math.h>
 #include <stdio.h>
@@ -169,12 +170,7 @@ matrix *train(Node **token_map, matrix *embedding_matrix, char *fpath,
                EPOCHS, (int)i, (int)tokens->count, avg_loss, loss_diff, token_miss_rate);
         last_avg_loss = avg_loss;
         eval_pairs(token_map, embedding_matrix);
-
-        // Learning rate is updated and decreases linearly
-        // TODO: Make a proper function for learning_rate
-        // such that we can change the LR function dynamically
-        // lr -= (lr * (0.5 / 100.0));
-        // printf("\tLearning rate updated to %.9f\n", lr);
+        printf("\tCurrent LR = %.5f\n", lr);
       }
 
       if (avg_loss > 0 && avg_loss < 1e-3) {
@@ -202,6 +198,7 @@ matrix *train(Node **token_map, matrix *embedding_matrix, char *fpath,
       }
 
       loss_sum += cross_entropy_loss(logits, target);
+      lr = lr_cosine(LEARNING_RATE, i, tokens->count);
       embedding_matrix = backprop(embedding_matrix, emb, logits, target, lr);
 
       matrix_free(emb);
