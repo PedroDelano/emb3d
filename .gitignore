@@ -1,4 +1,5 @@
 build/
-output/
+output/*
+!output/.gitkeep
 *.bin
 *.out
