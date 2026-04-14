@@ -182,7 +182,7 @@ matrix *train(Node **token_map, matrix *embedding_matrix, char *fpath,
     int unk = tk_encode(token_map, (char*)UNKOWN_TOKEN);
 
     for (size_t i = 0; i < (tokens->count - 1); i++) {
-      if (i % 5000 == 0 && i > 0) {
+      if (i % 10000 == 0 && i > 0) {
         token_miss_rate = 100.0 * token_miss / i;
         avg_loss = loss_sum / i;
         loss_diff = last_avg_loss > 0 ? 100.0 * (avg_loss - last_avg_loss) / last_avg_loss : 0;
@@ -232,6 +232,7 @@ matrix *train(Node **token_map, matrix *embedding_matrix, char *fpath,
   }
 
   fclose(fptr);
+  free(chpt);
 
   return embedding_matrix;
 }

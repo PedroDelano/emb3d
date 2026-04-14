@@ -1,7 +1,7 @@
 from datasets import load_dataset
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import random
 import re
-import sys
 
 random.seed(42)
 
@@ -9,93 +9,61 @@ sizes = [5, 10, 20, 50, 100, 1000, 5000, 10000, 20000]
 
 # Strong signals: one match in title or text is enough
 STRONG_KEYWORDS = [
-    "software",
-    "programming",
-    "algorithm",
-    "database",
-    "internet",
-    "processor",
-    "semiconductor",
-    "artificial intelligence",
-    "machine learning",
-    "operating system",
-    "encryption",
-    "cybersecurity",
-    "blockchain",
-    "cloud computing",
-    "data structure",
-    "compiler",
-    "open source",
-    "neural network",
-    "deep learning",
-    "natural language processing",
-    "virtualization",
-    "firmware",
-    "microchip",
-    "transistor",
-    "computer science",
-    "source code",
-    "web browser",
-    "search engine",
-    "computer network",
-    "programming language",
-    "video game",
-    "silicon valley",
-    "supercomputer",
-    "mainframe",
-]
-
-# Title-only keywords: too ambiguous in body text, but specific enough in titles
-TITLE_KEYWORDS = [
-    "computer",
-    "computing",
     "linux",
-    "javascript",
-    "html",
-    "cpu",
-    "gpu",
-    "ethernet",
-    "wifi",
-    "bluetooth",
-    "usb",
-    "tcp",
-    "http",
-    "google",
-    "microsoft",
-    "intel",
-    "nvidia",
-    "ibm",
-    "amd",
-    "github",
-    "stackoverflow",
-    "wikipedia",
-    "android",
-    "ios",
-    "robotics",
-    "telecommunications",
-    "electronics",
+    "software",
+    "hardware",
+    "algorithm",
+    "server",
+    "encryption",
+    "blockchain",
 ]
 
 
-def is_tech_article(title, text):
+def process_article(article):
+    """Process a single article: clean text and check if it's tech-related.
+    Returns cleaned text if tech article, None otherwise."""
+    title = article["title"]
+    text = article["text"]
+    text = re.sub(r"\n+", " ", text)
+    text = re.sub(r"\s+", " ", text)
+    text = text.strip()
+
+    if len(text) <= 100:
+        return None
+
     title_lower = title.lower()
     text_lower = text[:1000].lower()
+    if "disambiguation" in title:
+        return None
     for kw in STRONG_KEYWORDS:
         if kw in title_lower or kw in text_lower:
-            return True
-    for kw in TITLE_KEYWORDS:
-        if kw in title_lower:
-            return True
-    return False
+            print(f"     [TECH ARTICLE FOUND]: {title}")
+            return text
+    return None
+
+
+def write_subset(size, pool):
+    """Write a training data file for a given size."""
+    subset = pool[:size]
+    data_path = f"../data/train_{size}.txt"
+    with open(data_path, "w") as f:
+        for text in subset:
+            f.write(text + "\n")
+    print(f"  train_{size}.txt ({len(subset)} articles)")
 
 
 dataset = load_dataset(
     "wikimedia/wikipedia", "20231101.en", split="train", streaming=True
 )
 
-# Stream through articles, keeping only tech-related ones
-SCAN_LIMIT = 500000
+# Stream through articles, processing in thread pool
+SCAN_LIMIT = 5000000
+BATCH_SIZE = 512
+NUM_WORKERS = 8
+
 pool = []
+scanned = 0
+batch = []
 
 for i, article in enumerate(dataset):
     if i >= SCAN_LIMIT:
@@ -103,31 +71,38 @@ for i, article in enumerate(dataset):
     if len(pool) >= max(sizes):
         break
 
-    title = article["title"]
-    text = article["text"]
-    text = re.sub(r"\n+", " ", text)
-    text = re.sub(r"\s+", " ", text)
-    text = text.strip()
+    batch.append(article)
+    scanned = i + 1
 
-    if len(text) > 100 and is_tech_article(title, text):
-        pool.append(text)
+    if len(batch) >= BATCH_SIZE:
+        with ThreadPoolExecutor(max_workers=NUM_WORKERS) as executor:
+            results = executor.map(process_article, batch)
+            for result in results:
+                if result is not None:
+                    pool.append(result)
+                    if len(pool) >= max(sizes):
+                        break
+        batch = []
 
-    if (i + 1) % 5000 == 0:
-        print(f"Scanned {i + 1} articles, found {len(pool)} tech articles")
+        if scanned % 5000 < BATCH_SIZE:
+            print(f"Scanned {scanned} articles, found {len(pool)} tech articles")
 
-print(f"Pool: {len(pool)} tech articles (scanned {i + 1} total)")
+# Process remaining batch
+if batch and len(pool) < max(sizes):
+    with ThreadPoolExecutor(max_workers=NUM_WORKERS) as executor:
+        results = executor.map(process_article, batch)
+        for result in results:
+            if result is not None:
+                pool.append(result)
+
+print(f"Pool: {len(pool)} tech articles (scanned {scanned} total)")
 
 random.shuffle(pool)
 
-for size in sizes:
-    subset = pool[:size]
-
-    # Write training data
-    data_path = f"../data/train_{size}.txt"
-    with open(data_path, "w") as f:
-        for text in subset:
-            f.write(text + "\n")
-
-    print(f"  train_{size}.txt ({len(subset)} articles)")
+# Write all output files in parallel
+with ThreadPoolExecutor(max_workers=len(sizes)) as executor:
+    futures = [executor.submit(write_subset, size, pool) for size in sizes]
+    for future in as_completed(futures):
+        future.result()
 
 print("Done.")

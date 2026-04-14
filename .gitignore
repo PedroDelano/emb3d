@@ -3,3 +3,6 @@ output/*
 !output/.gitkeep
 *.bin
 *.out
+*.gif
+lab/media/
+__pycache__/
