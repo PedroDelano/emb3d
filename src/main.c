@@ -7,24 +7,26 @@
 
 void print_usage(char *prog) {
   printf("Usage:\n");
-  printf("  %s train <vocab> <data> <window_size> <emb_size> <lr> <epochs> <output_model>\n", prog);
+  printf("  %s train <vocab> <data> <window_size> <emb_size> <lr> <epochs> "
+         "<output_model>\n",
+         prog);
   printf("  %s eval <vocab> <model>\n", prog);
   printf("  %s similar <vocab> <model> <word_a> <word_b>\n", prog);
 }
 
 void run_eval(Node **token_map, matrix *embedding_matrix) {
   char *similar[][2] = {
-      {"software", "hardware"},   {"algorithm", "data"},
-      {"network", "internet"},    {"server", "database"},
-      {"linux", "kernel"},        {"encryption", "security"},
-      {"processor", "memory"},    {"code", "programming"},
+      {"software", "hardware"}, {"algorithm", "data"},
+      {"network", "internet"},  {"server", "database"},
+      {"linux", "kernel"},      {"encryption", "security"},
+      {"processor", "memory"},  {"code", "programming"},
   };
 
   char *dissimilar[][2] = {
-      {"software", "river"},      {"algorithm", "painting"},
-      {"network", "forest"},      {"server", "mountain"},
-      {"linux", "ocean"},         {"encryption", "garden"},
-      {"processor", "novel"},     {"code", "weather"},
+      {"software", "river"},  {"algorithm", "painting"},
+      {"network", "forest"},  {"server", "mountain"},
+      {"linux", "ocean"},     {"encryption", "garden"},
+      {"processor", "novel"}, {"code", "weather"},
   };
 
   int num_similar = 8;
@@ -79,7 +81,9 @@ int main(int argc, char *argv[]) {
 
   if (strcmp(cmd, "train") == 0) {
     if (argc < 9) {
-      printf("Usage: %s train <vocab> <data> <window_size> <emb_size> <lr> <epochs> <output_model>\n", argv[0]);
+      printf("Usage: %s train <vocab> <data> <window_size> <emb_size> <lr> "
+             "<epochs> <output_model>\n",
+             argv[0]);
       return 1;
     }
     char *vocab = argv[2];
@@ -94,7 +98,8 @@ int main(int argc, char *argv[]) {
     Node **token_map = generate_token_map(vocab);
     matrix *embedding_matrix = embedding_matrix_new(get_vocab_size(vocab));
 
-    embedding_matrix = train(token_map, embedding_matrix, data, window_size, output);
+    embedding_matrix =
+        train(token_map, embedding_matrix, data, window_size, output);
 
     if (matrix_save(embedding_matrix, output) == 0) {
       printf("Model saved to %s\n", output);

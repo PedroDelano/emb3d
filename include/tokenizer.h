@@ -6,7 +6,7 @@
 #include <stdlib.h>
 
 extern const int MAX_TOKEN_SIZE;
-extern const char *UNKOWN_TOKEN ;
+extern const char *UNKOWN_TOKEN;
 
 typedef struct Array {
   char **data;

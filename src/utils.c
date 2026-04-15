@@ -15,10 +15,10 @@ int min(int a, int b) {
 }
 
 int file_exists(const char *filename) {
-    FILE *file = fopen(filename, "r");
-    if (file) {
-        fclose(file);
-        return 1; // Exists
-    }
-    return 0; // Does not exist
+  FILE *file = fopen(filename, "r");
+  if (file) {
+    fclose(file);
+    return 1; // Exists
+  }
+  return 0; // Does not exist
 }

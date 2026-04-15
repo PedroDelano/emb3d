@@ -1,7 +1,7 @@
 #include "matrix.h"
 #include "utils.h"
-#include <math.h>
 #include <assert.h>
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -90,7 +90,8 @@ matrix *matrix_new_sqr(unsigned int n) {
   return matrix_new(n, n);
 }
 
-matrix *matrix_new_rand(unsigned int num_rows, unsigned int num_cols, int norm) {
+matrix *matrix_new_rand(unsigned int num_rows, unsigned int num_cols,
+                        int norm) {
 
   assert(norm == 1 || norm == 0);
 
@@ -181,7 +182,8 @@ void matrix_print(const matrix *m) {
 
 int matrix_save(matrix *m, const char *fpath) {
   FILE *f = fopen(fpath, "wb");
-  if (f == NULL) return -1;
+  if (f == NULL)
+    return -1;
   fwrite(&m->num_rows, sizeof(unsigned int), 1, f);
   fwrite(&m->num_cols, sizeof(unsigned int), 1, f);
   for (unsigned int i = 0; i < m->num_rows; i++) {
@@ -193,7 +195,8 @@ int matrix_save(matrix *m, const char *fpath) {
 
 matrix *matrix_load(const char *fpath) {
   FILE *f = fopen(fpath, "rb");
-  if (f == NULL) return NULL;
+  if (f == NULL)
+    return NULL;
   unsigned int rows, cols;
   fread(&rows, sizeof(unsigned int), 1, f);
   fread(&cols, sizeof(unsigned int), 1, f);

@@ -1,9 +1,9 @@
-#include "utils.h"
 #include "embedding.h"
+#include "learning_rate.h"
 #include "linalg.h"
 #include "matrix.h"
 #include "tokenizer.h"
-#include "learning_rate.h"
+#include "utils.h"
 #include <assert.h>
 #include <math.h>
 #include <stdio.h>
@@ -14,17 +14,17 @@ int EPOCHS = 3;
 
 void eval_pairs(Node **token_map, matrix *embedding_matrix) {
   char *similar[][2] = {
-      {"software", "hardware"},   {"algorithm", "data"},
-      {"network", "internet"},    {"server", "database"},
-      {"linux", "kernel"},        {"encryption", "security"},
-      {"processor", "memory"},    {"code", "programming"},
+      {"software", "hardware"}, {"algorithm", "data"},
+      {"network", "internet"},  {"server", "database"},
+      {"linux", "kernel"},      {"encryption", "security"},
+      {"processor", "memory"},  {"code", "programming"},
   };
 
   char *dissimilar[][2] = {
-      {"software", "river"},      {"algorithm", "painting"},
-      {"network", "forest"},      {"server", "mountain"},
-      {"linux", "ocean"},         {"encryption", "garden"},
-      {"processor", "novel"},     {"code", "weather"},
+      {"software", "river"},  {"algorithm", "painting"},
+      {"network", "forest"},  {"server", "mountain"},
+      {"linux", "ocean"},     {"encryption", "garden"},
+      {"processor", "novel"}, {"code", "weather"},
   };
 
   int num_similar = 8;
@@ -68,14 +68,17 @@ void eval_pairs(Node **token_map, matrix *embedding_matrix) {
   avg_dissimilar /= num_dissimilar;
   double std_dissimilar = 0.0;
   for (int i = 0; i < num_dissimilar; i++)
-    std_dissimilar += (dis_vals[i] - avg_dissimilar) * (dis_vals[i] - avg_dissimilar);
+    std_dissimilar +=
+        (dis_vals[i] - avg_dissimilar) * (dis_vals[i] - avg_dissimilar);
   std_dissimilar = sqrt(std_dissimilar / num_dissimilar);
   printf("\tDissimilar pairs: %.4f ± %.4f\n", avg_dissimilar, std_dissimilar);
 
-  double sigma = sqrt(std_similar * std_similar + std_dissimilar * std_dissimilar);
+  double sigma =
+      sqrt(std_similar * std_similar + std_dissimilar * std_dissimilar);
   double separation = avg_similar - avg_dissimilar;
   double compat = sigma > 0 ? separation / sigma : 0;
-  printf("\tCompatibility: %.4f (sep=%.4f, σ=%.4f)\n", compat, separation, sigma);
+  printf("\tCompatibility: %.4f (sep=%.4f, σ=%.4f)\n", compat, separation,
+         sigma);
 }
 
 matrix *forward_pass(matrix *embedding_matrix, matrix *embedding_vector) {
@@ -86,7 +89,8 @@ matrix *forward_pass(matrix *embedding_matrix, matrix *embedding_vector) {
 }
 
 matrix *backprop(matrix *embedding_matrix, matrix *embedding_vector,
-                 matrix *forw_pass, int correct_token_index, double learning_rate) {
+                 matrix *forw_pass, int correct_token_index,
+                 double learning_rate) {
 
   int vocab_size = embedding_matrix->num_rows;
 
@@ -108,6 +112,72 @@ matrix *backprop(matrix *embedding_matrix, matrix *embedding_vector,
   matrix_free(grad);
 
   return embedding_matrix;
+}
+
+typedef struct Checkpoint_S {
+  char path[256];
+  int train_step;
+  int epoch;
+} Checkpoint;
+
+char *add_ext(char *base, char *ext) {
+  size_t len = strlen(base) + strlen(ext) + 1;
+  char *path = malloc(len);
+  strcpy(path, base);
+  strcat(path, ext);
+  return path;
+}
+
+void save_checkpoint(char *base_path, int train_step, int epoch,
+                     matrix *embedding_matrix) {
+
+  char *mtx_path = add_ext(base_path, ".mtx\0");
+  char *ckpt_path = add_ext(base_path, ".ckpt\0");
+
+  Checkpoint ckpt = {0};
+  strcpy(ckpt.path, mtx_path);
+  ckpt.train_step = train_step;
+  ckpt.epoch = epoch;
+
+  FILE *fp = fopen(ckpt_path, "wb");
+  if (fp != NULL) {
+    fwrite(&ckpt, sizeof(Checkpoint), 1, fp);
+    fclose(fp);
+  }
+
+  matrix_save(embedding_matrix, mtx_path);
+  printf("\tSaved checkpoint to %s (TS=%d, E=%d)\n", ckpt_path, train_step,
+         epoch);
+  free(ckpt_path);
+  free(mtx_path);
+}
+
+Checkpoint *read_checkpoint(char *base_path) {
+
+  char *ckpt_path = add_ext(base_path, ".ckpt\0");
+  FILE *fp = fopen(ckpt_path, "rb");
+  Checkpoint *ckpt = malloc(sizeof(Checkpoint));
+
+  if (fp == NULL) {
+    printf("[DEBUG] %s not found\n", ckpt_path);
+    strcpy(ckpt->path, ckpt_path);
+    ckpt->train_step = 0;
+    ckpt->epoch = 0;
+    return ckpt;
+  }
+
+  if (fread(ckpt, sizeof(Checkpoint), 1, fp) != 1) {
+    printf("[DEBUG] %s not a valid Checkpoint\n", ckpt_path);
+    free(ckpt);
+    fclose(fp);
+    strcpy(ckpt->path, ckpt_path);
+    ckpt->train_step = 0;
+    ckpt->epoch = 0;
+    return ckpt;
+  }
+
+  fclose(fp);
+  return ckpt;
 }
 
 matrix *train(Node **token_map, matrix *embedding_matrix, char *fpath,
@@ -138,29 +208,28 @@ matrix *train(Node **token_map, matrix *embedding_matrix, char *fpath,
   // Define window_size array
   Array *window = (Array *)malloc(sizeof(Array));
 
-  // Define the checkpoint file as .bin.ckpt
-  char *ext = ".ckpt\0";
-  size_t len = strlen(output) + strlen(ext) + 1;
-  char *chpt = malloc(len);
-  strcpy(chpt, output);
-  strcat(chpt, ext);
+  /***********************************************
+   * CHECKPOINT OPERATIONS
+   ***********************************************/
+  Checkpoint *checkpoint = read_checkpoint(output);
 
-  // Checking if checkpoint exists
-  // TODO: Add the starting point (the index 
-  // where we stopped) to train starting from
-  // the correct place instead of restarting
-  if (file_exists(chpt) == 1) {
-    printf("Reading embedding matrix from checkpoint at %s\n", chpt);
-    embedding_matrix = matrix_load(chpt);
+  // Check if embedding matrix
+  // exists in checkpoint path
+  if (file_exists(checkpoint->path) == 1) {
+    printf("[DEBUG] Checkpoint found at %s (TS=%d, E=%d)\n", checkpoint->path,
+           checkpoint->train_step, checkpoint->epoch);
+    embedding_matrix = matrix_load(checkpoint->path);
   } else {
-    printf("No checkpoint was found, starting from scratch\n");
+    printf("[DEBUG] No checkpoint was found, starting from scratch\n");
   }
+
+  /*************************************************/
 
   int target = -1;
   double avg_loss = 0;
   double lr = LEARNING_RATE;
 
-  for (int epoch = 1; epoch < EPOCHS + 1; epoch++) {
+  for (int epoch = checkpoint->epoch; epoch < EPOCHS + 1; epoch++) {
 
     // loss per epoch
     double loss_sum = 0;
@@ -179,20 +248,24 @@ matrix *train(Node **token_map, matrix *embedding_matrix, char *fpath,
     window->count = 0;
     window->size = window_size;
 
-    int unk = tk_encode(token_map, (char*)UNKOWN_TOKEN);
+    int unk = tk_encode(token_map, (char *)UNKOWN_TOKEN);
 
-    for (size_t i = 0; i < (tokens->count - 1); i++) {
+    for (size_t i = checkpoint->train_step; i < (tokens->count - 1); i++) {
+
       if (i % 10000 == 0 && i > 0) {
         token_miss_rate = 100.0 * token_miss / i;
         avg_loss = loss_sum / i;
-        loss_diff = last_avg_loss > 0 ? 100.0 * (avg_loss - last_avg_loss) / last_avg_loss : 0;
-        printf("[Epoch %d / %d] Running %d out of %d / Loss = %.5f (%.3f %%) / Tk. Miss = %.1f %% \n", epoch,
-               EPOCHS, (int)i, (int)tokens->count, avg_loss, loss_diff, token_miss_rate);
+        loss_diff = last_avg_loss > 0
+                        ? 100.0 * (avg_loss - last_avg_loss) / last_avg_loss
+                        : 0;
+        printf("[Epoch %d / %d] Running %d out of %d / Loss = %.5f (%.3f %%) / "
+               "Tk. Miss = %.1f %% \n",
+               epoch, EPOCHS, (int)i, (int)tokens->count, avg_loss, loss_diff,
+               token_miss_rate);
         last_avg_loss = avg_loss;
         eval_pairs(token_map, embedding_matrix);
         printf("\tCurrent LR = %.5f\n", lr);
-        matrix_save(embedding_matrix, chpt);
-        printf("\tSaved checkpoint at %s\n", chpt);
+        save_checkpoint(output, i, epoch, embedding_matrix);
       }
 
       if (avg_loss > 0 && avg_loss < 1e-3) {
@@ -228,11 +301,8 @@ matrix *train(Node **token_map, matrix *embedding_matrix, char *fpath,
 
       window = pop_from_array(window);
     }
-
   }
 
   fclose(fptr);
-  free(chpt);
-
   return embedding_matrix;
 }
