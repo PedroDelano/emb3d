@@ -157,6 +157,7 @@ Checkpoint *read_checkpoint(char *base_path) {
   char *ckpt_path = add_ext(base_path, ".ckpt\0");
   FILE *fp = fopen(ckpt_path, "rb");
   Checkpoint *ckpt = malloc(sizeof(Checkpoint));
+  free(ckpt_path);
 
   if (fp == NULL) {
     printf("[DEBUG] %s not found\n", ckpt_path);
