@@ -114,6 +114,9 @@ matrix *backprop(matrix *embedding_matrix, matrix *embedding_vector,
   return embedding_matrix;
 }
 
+// TODO:
+// - Separate into a file
+// - Add token_miss and loss_sum
 typedef struct Checkpoint_S {
   char path[256];
   int train_step;
@@ -265,6 +268,8 @@ matrix *train(Node **token_map, matrix *embedding_matrix, char *fpath,
                token_miss_rate);
         last_avg_loss = avg_loss;
         eval_pairs(token_map, embedding_matrix);
+        printf("\tSparsity (ε=1e-2) = %.2f %% (1.0 = fully sparse)\n",
+               100.0 * sparcity_score(embedding_matrix, 1e-2));
         printf("\tCurrent LR = %.5f\n", lr);
         save_checkpoint(output, i, epoch, embedding_matrix);
       }

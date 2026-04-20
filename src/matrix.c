@@ -128,6 +128,90 @@ matrix *matrix_new_rand(unsigned int num_rows, unsigned int num_cols,
   return m;
 }
 
+// Box-Muller: standard normal sample N(0, 1)
+static double rand_normal(void) {
+  static const double TWO_PI = 6.28318530717958647692;
+  double u1, u2;
+  do {
+    u1 = (double)rand() / (double)RAND_MAX;
+  } while (u1 == 0.0);
+  u2 = (double)rand() / (double)RAND_MAX;
+  return sqrt(-2.0 * log(u1)) * cos(TWO_PI * u2);
+}
+
+// Orthogonal initialization (Saxe et al. 2013).
+// Builds a Gaussian random matrix and orthonormalizes via modified Gram-Schmidt
+// (the QR path PyTorch's nn.init.orthogonal_ takes). When the requested shape
+// is wide (cols > rows), we work on the transpose so the long axis is reduced
+// — the result has orthonormal rows instead of orthonormal columns.
+matrix *matrix_new_orthogonal(unsigned int num_rows, unsigned int num_cols) {
+
+  unsigned int work_rows = num_rows;
+  unsigned int work_cols = num_cols;
+  int transposed = 0;
+  if (num_cols > num_rows) {
+    work_rows = num_cols;
+    work_cols = num_rows;
+    transposed = 1;
+  }
+
+  matrix *a = matrix_new(work_rows, work_cols);
+  for (unsigned int i = 0; i < work_rows; i++) {
+    for (unsigned int j = 0; j < work_cols; j++) {
+      a->data[i][j] = rand_normal();
+    }
+  }
+
+  // Modified Gram-Schmidt over columns of a.
+  for (unsigned int j = 0; j < work_cols; j++) {
+    double norm = 0;
+    for (unsigned int i = 0; i < work_rows; i++) {
+      norm += a->data[i][j] * a->data[i][j];
+    }
+    norm = sqrt(norm);
+    assert(norm > 0 && "degenerate column during orthogonalization");
+    for (unsigned int i = 0; i < work_rows; i++) {
+      a->data[i][j] /= norm;
+    }
+    for (unsigned int k = j + 1; k < work_cols; k++) {
+      double proj = 0;
+      for (unsigned int i = 0; i < work_rows; i++) {
+        proj += a->data[i][j] * a->data[i][k];
+      }
+      for (unsigned int i = 0; i < work_rows; i++) {
+        a->data[i][k] -= proj * a->data[i][j];
+      }
+    }
+  }
+
+  // Verify orthonormality of the columns of `a`: a^T a should equal I.
+  // Floating-point tolerance scales with the inner-product summation length.
+  const double tol = 1e-9 * (double)work_rows;
+  for (unsigned int i = 0; i < work_cols; i++) {
+    for (unsigned int j = i; j < work_cols; j++) {
+      double ip = 0;
+      for (unsigned int k = 0; k < work_rows; k++) {
+        ip += a->data[k][i] * a->data[k][j];
+      }
+      double expected = (i == j) ? 1.0 : 0.0;
+      assert(fabs(ip - expected) < tol &&
+             "orthogonal init failed: columns are not orthonormal");
+    }
+  }
+
+  if (transposed) {
+    matrix *t = matrix_new(num_rows, num_cols);
+    for (unsigned int i = 0; i < work_rows; i++) {
+      for (unsigned int j = 0; j < work_cols; j++) {
+        t->data[j][i] = a->data[i][j];
+      }
+    }
+    matrix_free(a);
+    return t;
+  }
+  return a;
+}
+
 matrix *matrix_new_eye(unsigned int n) {
   // Creates an identity matrix
   matrix *m = matrix_new(n, n);

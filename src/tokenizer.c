@@ -131,7 +131,6 @@ Array *add_to_array(Array *arr, char *str) {
 
   arr->data[arr->count] = w;
   arr->count++;
-  strcpy(str, "");
 
   return arr;
 }
@@ -159,18 +158,21 @@ Array *tokenize(char *str) {
     for (size_t j = 0; j < strlen(PUNCTUATION); j++) {
       if (str[i] == PUNCTUATION[j]) {
         arr = add_to_array(arr, _word);
+        _word[0] = '\0';
         continue;
       }
     }
 
     if (str[i] == ' ') {
       arr = add_to_array(arr, _word);
+      _word[0] = '\0';
       continue;
     }
 
     // append character, flush if _word is full
     if (strlen(_word) >= (size_t)MAX_TOKEN_SIZE - 2) {
       arr = add_to_array(arr, _word);
+      _word[0] = '\0';
     }
     char lower_str = tolower(str[i]);
     _word = strncat(_word, &lower_str, 1);
@@ -178,6 +180,7 @@ Array *tokenize(char *str) {
 
   if (strlen(_word) > 0) {
     arr = add_to_array(arr, _word);
+    _word[0] = '\0';
   }
 
   // we are done with _word so we better

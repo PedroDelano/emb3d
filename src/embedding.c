@@ -7,13 +7,27 @@
 #include "embedding.h"
 #include "tokenizer.h"
 #include <assert.h>
+#include <math.h>
 
 unsigned int EMBEDDING_SIZE = 32;
 
 void embedding_set_size(unsigned int size) { EMBEDDING_SIZE = size; }
 
+double sparcity_score(matrix *embedding_matrix, double epsilon) {
+  unsigned int total = embedding_matrix->num_rows * embedding_matrix->num_cols;
+  unsigned int count = 0;
+  for (unsigned int i = 0; i < embedding_matrix->num_rows; i++) {
+    for (unsigned int j = 0; j < embedding_matrix->num_cols; j++) {
+      if (fabs(embedding_matrix->data[i][j]) < epsilon) {
+        count++;
+      }
+    }
+  }
+  return (double)count / (double)total;
+}
+
 matrix *embedding_matrix_new(unsigned int vocab_size) {
-  return matrix_new_rand(vocab_size, EMBEDDING_SIZE, 1);
+  return matrix_new_orthogonal(vocab_size, EMBEDDING_SIZE);
 }
 
 double *embedding_retrieve(matrix *embedding_matrix, int token_id) {
